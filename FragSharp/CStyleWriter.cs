@@ -119,25 +119,6 @@ namespace FragSharp
             Write(LineBreak);
         }
 
-        override protected void CompileMethodParameter(ParameterSyntax parameter)
-        {
-            // Check if symbol is a shader variable
-            if (IsSampler(parameter))
-            {
-                Write("sampler {0}, float2 {0}_{1}, float2 {0}_{2}", parameter.Identifier.ValueText, Sampler.SizeSuffix, Sampler.DxDySuffix);
-            }
-            else
-            {
-                if (parameter.Modifiers.ToList().Any(modifier => modifier.IsKeyword() && modifier.ToString() == "ref"))
-                {
-                    Write("inout ");
-                }
-
-                CompileExpression(parameter.Type);
-                Write(" {0}", parameter.Identifier.ValueText);
-            }
-        }
-
         override protected void CompileIfStatement(IfStatementSyntax statement)
         {
             BeginLine("if{0}(", Space);
