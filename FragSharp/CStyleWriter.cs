@@ -27,6 +27,12 @@ namespace FragSharp
         }
     }
 
+    public class ShaderCompilation
+    {
+        public string Code, Boilerplate;
+        public ShaderCompilation(string Code, string Boilerplate) { this.Code = Code; this.Boilerplate = Boilerplate; }
+    }
+
     internal abstract class CStyleWriter : AbstractCodeWriter
     {
         public CStyleWriter(Dictionary<SyntaxTree, SemanticModel> models, Compilation compilation)
