@@ -45,6 +45,11 @@ namespace FragSharp
         {
         }
 
+        public CStyleWriter(GlslWriter writer)
+            : base(writer)
+        {
+        }
+
         override protected CompiledMethod CompileMethod(Symbol symbol)
         {
             ClearString();
