@@ -7,8 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 using FragSharpFramework;
 
-// TODO: Everything with Hlsl attribute tags needs to be checked and given Glsl/WebGl tags (if they can be shared)
-
 namespace FragSharpFramework
 {
     abstract class __TypeMaps
@@ -391,7 +389,6 @@ namespace FragSharpFramework
             return (float)Math.Floor(value);
         }
 
-        // TODO: check that all of these math operations are valid in GLSL
         [Hlsl("floor"), Glsl("floor")] public static vec2 floor(vec2 v) { return vec(floor(v.x), floor(v.y)); }
         [Hlsl("floor"), Glsl("floor")] public static vec3 floor(vec3 v) { return vec(floor(v.x), floor(v.y), floor(v.z)); }
         [Hlsl("floor"), Glsl("floor")] public static vec4 floor(vec4 v) { return vec(floor(v.x), floor(v.y), floor(v.z), floor(v.w)); }
