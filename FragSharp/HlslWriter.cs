@@ -220,7 +220,7 @@ namespace FragSharp
                     Write(translation_info.Translation);
 
                     Write("(");
-                    CompileArgumentList(expression.ArgumentList, false);
+                    CompileArgumentList(expression.ArgumentList, false, (translation_info.TranslationType == TranslationType.ReverseArguments));
                     Write(")");
                 }
                 else
@@ -237,7 +237,7 @@ namespace FragSharp
                     CompileExpression(expression.Expression);
 
                     Write("(");
-                    CompileArgumentList(expression.ArgumentList, result.UsesSampler);
+                    CompileArgumentList(expression.ArgumentList, result.UsesSampler, false);
                     Write(")");
                 }
             }

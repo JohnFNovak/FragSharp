@@ -330,7 +330,7 @@ namespace FragSharp
         abstract protected void CompileVariableDeclaration(VariableDeclarationSyntax declaration);
         abstract protected void CompileVariableDeclarator(VariableDeclaratorSyntax declarator, TypeSyntax type);
         abstract protected void CompileEqualsValueClause(EqualsValueClauseSyntax clause);
-        abstract protected void CompileArgumentList(ArgumentListSyntax list, bool AddVertexToPixelVar);
+        abstract protected void CompileArgumentList(ArgumentListSyntax list, bool AddVertexToPixelVar, bool reversed);
 
         abstract protected string VertexToPixelVar { get; }
         abstract protected string VertexToPixelType { get; }

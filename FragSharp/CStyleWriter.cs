@@ -170,7 +170,7 @@ namespace FragSharp
             CompileExpression(creation.Type);
 
             Write("(");
-            CompileArgumentList(creation.ArgumentList, false);
+            CompileArgumentList(creation.ArgumentList, false, false);
             Write(")");
         }
 
@@ -273,7 +273,7 @@ namespace FragSharp
             }
         }
 
-        override protected void CompileArgumentList(ArgumentListSyntax list, bool AddVertexToPixelVar)
+        override protected void CompileArgumentList(ArgumentListSyntax list, bool AddVertexToPixelVar, bool reversed)
         {
             var args = list.Arguments;
 
@@ -281,7 +281,12 @@ namespace FragSharp
             if (AddVertexToPixelVar || args.Count > 0 && args.Any(arg => IsSampler(arg)))
             {
                 Write(VertexToPixelVar + (args.Count > 0 ? Comma : string.Empty));
-            } 
+            }
+
+            if (reversed) // Supposed to have reversed arguments 
+            {
+                args.Reverse();
+            }
 
             // Write each argument
             foreach (var argument in args)
@@ -384,6 +389,14 @@ namespace FragSharp
         {
             var left = expression.Left;
             var right = expression.Right;
+
+            //var translation_info = TranslationLookup.SymbolMap[GetSymbol(expression.Name)];
+
+            //if (translation_info.TranslationType == TranslationType.ReverseArguments)
+            //{
+            //    Swap(ref left, ref right);
+            //}
+
             bool is_vec = IsVec(left) && IsVec(right);
 
             switch (expression.OperatorToken.ValueText)
