@@ -7,17 +7,17 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace FragSharpFramework
 {
-    [Hlsl("float2")]
+    [Hlsl("float2"), Glsl("vec2")]
     public struct RelativeIndex
     {
-        [Hlsl("x")]
+        [Hlsl("x"), Glsl("x")]
         public float i;
-        [Hlsl("y")]
+        [Hlsl("y"), Glsl("y")]
         public float j;
 
-        [Hlsl("float2")]
+        [Hlsl("float2"), Glsl("vec2")]
         public RelativeIndex(float i, float j) { this.i = i; this.j = j; }
-
+        
         public static RelativeIndex operator *(float a, RelativeIndex v)
         {
             return new RelativeIndex(a * v.i, a * v.j);
@@ -84,20 +84,20 @@ namespace FragSharpFramework
         }
     }
 
-    [Hlsl("float2")]
+    [Hlsl("float2"), Glsl("vec2")]
     public partial struct vec2
     {
-        [Hlsl("float2")]
+        [Hlsl("float2"), Glsl("vec2")]
         public vec2(float x, float y)
         {
             this.x = x;
             this.y = y;
         }
 
-        [Hlsl("x")]
+        [Hlsl("x"), Glsl("x")]
         public float x;
 
-        [Hlsl("y")]
+        [Hlsl("y"), Glsl("y")]
         public float y;
 
         public override string ToString()
@@ -225,10 +225,10 @@ namespace FragSharpFramework
         public static readonly vec2 Ones = new vec2(1, 1);
     }
 
-    [Hlsl("float3")]
+    [Hlsl("float3"), Glsl("vec3")]
     public partial struct vec3
     {
-        [Hlsl("float3")]
+        [Hlsl("float3"), Glsl("vec3")]
         public vec3(float x, float y, float z)
         {
             this.x = x;
@@ -236,16 +236,16 @@ namespace FragSharpFramework
             this.z = z;
         }
 
-        [Hlsl("x")]
+        [Hlsl("x"), Glsl("x")]
         public float x;
 
-        [Hlsl("y")]
+        [Hlsl("y"), Glsl("y")]
         public float y;
 
-        [Hlsl("z")]
+        [Hlsl("z"), Glsl("z")]
         public float z;
 
-        [Hlsl("xy")]
+        [Hlsl("xy"), Glsl("xy")]
         public vec2 xy { get { return new vec2(x, y); } set { x = value.x; y = value.y; } }
 
         public static vec3 operator *(float a, vec3 v)
@@ -337,7 +337,7 @@ namespace FragSharpFramework
         public static readonly vec3 Zero = new vec3(0, 0, 0);
     }
 
-    [Hlsl("float4")]
+    [Hlsl("float4"), Glsl("vec4")]
     public partial struct vec4 : Convertible</*KeepInCopy*/ vec4, vec4>
     {
         public vec4 ConvertFrom(/*KeepInCopy*/ vec4 v)
@@ -350,7 +350,7 @@ namespace FragSharpFramework
             return (/*KeepInCopy*/ vec4)this;
         }
 
-        [Hlsl("float4")]
+        [Hlsl("float4"), Glsl("vec4")]
         public vec4(float x, float y, float z, float w)
         {
             this.x = x;
@@ -359,52 +359,52 @@ namespace FragSharpFramework
             this.w = w;
         }
 
-        [Hlsl("x")]
+        [Hlsl("x"), Glsl("x")]
         public float x;
 
-        [Hlsl("y")]
+        [Hlsl("y"), Glsl("y")]
         public float y;
 
-        [Hlsl("z")]
+        [Hlsl("z"), Glsl("z")]
         public float z;
 
-        [Hlsl("w")]
+        [Hlsl("w"), Glsl("w")]
         public float w;
 
-        [Hlsl("xy")]
+        [Hlsl("xy"), Glsl("xy")]
         public vec2 xy { get { return new vec2(x, y); } set { x = value.x; y = value.y; } }
 
-        [Hlsl("zw")]
+        [Hlsl("zw"), Glsl("zw")]
         public vec2 zw { get { return new vec2(z, w); } set { z = value.x; w = value.y; } }
 
-        [Hlsl("xyz")]
+        [Hlsl("xyz"), Glsl("xyz")]
         public vec3 xyz { get { return new vec3(x, y, z); } set { x = value.x; y = value.y; z = value.z; } }
 
-        [Hlsl("yzw")]
+        [Hlsl("yzw"), Glsl("yzw")]
         public vec3 yzw { get { return new vec3(y, z, w); } set { y = value.x; z = value.y; w = value.z; } }
 
-        [Hlsl("r")]
+        [Hlsl("r"), Glsl("r")]
         public float r { get { return x; } set { x = value; } }
 
-        [Hlsl("g")]
+        [Hlsl("g"), Glsl("g")]
         public float g { get { return y; } set { y = value; } }
 
-        [Hlsl("b")]
+        [Hlsl("b"), Glsl("b")]
         public float b { get { return z; } set { z = value; } }
 
-        [Hlsl("a")]
+        [Hlsl("a"), Glsl("a")]
         public float a { get { return w; } set { w = value; } }
 
-        [Hlsl("rgb")]
+        [Hlsl("rgb"), Glsl("rgb")]
         public vec3 rgb { get { return xyz; } set { xyz = value; } }
 
-        [Hlsl("gba")]
+        [Hlsl("gba"), Glsl("gba")]
         public vec3 gba { get { return yzw; } set { yzw = value; } }
 
-        [Hlsl("rg")]
+        [Hlsl("rg"), Glsl("rg")]
         public vec2 rg { get { return xy; } set { xy = value; } }
 
-        [Hlsl("ba")]
+        [Hlsl("ba"), Glsl("ba")]
         public vec2 ba { get { return zw; } set { zw = value; } }
 
         public float this[int index]
@@ -531,7 +531,7 @@ namespace FragSharpFramework
         // Extra code gen goes here
     }
 
-    [Hlsl("float4")]
+    [Hlsl("float4"), Glsl("vec4")]
     public partial struct color : Convertible</*KeepInCopy*/ vec4, color>
     {
         public color ConvertFrom(/*KeepInCopy*/ vec4 v)
@@ -544,7 +544,7 @@ namespace FragSharpFramework
             return (/*KeepInCopy*/ vec4)this;
         }
 
-        [Hlsl("float4")]
+        [Hlsl("float4"), Glsl("vec4")]
         public color(float x, float y, float z, float w)
         {
             this.x = x;
@@ -569,52 +569,52 @@ namespace FragSharpFramework
             }
         }
 
-        [Hlsl("x")]
+        [Hlsl("x"), Glsl("x")]
         public float x;
 
-        [Hlsl("y")]
+        [Hlsl("y"), Glsl("y")]
         public float y;
 
-        [Hlsl("z")]
+        [Hlsl("z"), Glsl("z")]
         public float z;
 
-        [Hlsl("w")]
+        [Hlsl("w"), Glsl("w")]
         public float w;
 
-        [Hlsl("xy")]
+        [Hlsl("xy"), Glsl("xy")]
         public vec2 xy { get { return new vec2(x, y); } set { x = value.x; y = value.y; } }
 
-        [Hlsl("zw")]
+        [Hlsl("zw"), Glsl("zw")]
         public vec2 zw { get { return new vec2(z, w); } set { z = value.x; w = value.y; } }
 
-        [Hlsl("xyz")]
+        [Hlsl("xyz"), Glsl("xyz")]
         public vec3 xyz { get { return new vec3(x, y, z); } set { x = value.x; y = value.y; z = value.z; } }
 
-        [Hlsl("yzw")]
+        [Hlsl("yzw"), Glsl("yzw")]
         public vec3 yzw { get { return new vec3(y, z, w); } set { y = value.x; z = value.y; w = value.z; } }
 
-        [Hlsl("r")]
+        [Hlsl("r"), Glsl("r")]
         public float r { get { return x; } set { x = value; } }
 
-        [Hlsl("g")]
+        [Hlsl("g"), Glsl("g")]
         public float g { get { return y; } set { y = value; } }
 
-        [Hlsl("b")]
+        [Hlsl("b"), Glsl("b")]
         public float b { get { return z; } set { z = value; } }
 
-        [Hlsl("a")]
+        [Hlsl("a"), Glsl("a")]
         public float a { get { return w; } set { w = value; } }
 
-        [Hlsl("rgb")]
+        [Hlsl("rgb"), Glsl("rgb")]
         public vec3 rgb { get { return xyz; } set { xyz = value; } }
 
-        [Hlsl("gba")]
+        [Hlsl("gba"), Glsl("gba")]
         public vec3 gba { get { return yzw; } set { yzw = value; } }
 
-        [Hlsl("rg")]
+        [Hlsl("rg"), Glsl("rg")]
         public vec2 rg { get { return xy; } set { xy = value; } }
 
-        [Hlsl("ba")]
+        [Hlsl("ba"), Glsl("ba")]
         public vec2 ba { get { return zw; } set { zw = value; } }
 
 

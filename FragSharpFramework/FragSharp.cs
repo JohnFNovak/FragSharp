@@ -7,17 +7,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 using FragSharpFramework;
 
+// TODO: Everything with Hlsl attribute tags needs to be checked and given Glsl/WebGl tags (if they can be shared)
+
 namespace FragSharpFramework
 {
     abstract class __TypeMaps
     {
-        [Hlsl("float")] void 
+        [Hlsl("float"), Glsl("float")] void 
             _( float _) {}
 
-        [Hlsl("int")] void 
+        [Hlsl("int"), Glsl("int")] void 
             _( int _) {}
 
-        [Hlsl("bool")] void 
+        [Hlsl("bool"), Glsl("bool")] void 
             _( bool _) {}
     }
 
@@ -107,7 +109,8 @@ namespace FragSharpFramework
         }
     }
 
-    [Hlsl("sampler")]
+    // TODO: figure out what inherits from this and make sure that they are all using it in the 2d way.
+    [Hlsl("sampler"), Glsl("sampler2D")]
     public abstract class Sampler : FragSharpStd
     {
         public Sampler() { }
@@ -128,6 +131,7 @@ namespace FragSharpFramework
         }
 
         public const string SizeSuffix = "size", DxDySuffix = "dxdy";
+        // TODO: It's not clear to me what this does, but I may need to add Glsl attribute tags
         [Hlsl(SizeSuffix, TranslationType.UnderscoreAppend)] public vec2 Size;
         [Hlsl(DxDySuffix, TranslationType.UnderscoreAppend)] public vec2 DxDy;
 
@@ -189,14 +193,14 @@ namespace FragSharpFramework
     /// </summary>
     public abstract class Shader : FragSharpStd { }
 
-    [Hlsl("VertexToPixel")]
+    [Hlsl("VertexToPixel"), Glsl("VertexToPixel")]
     public struct VertexOut
     {
-        [POSITION0, Hlsl]
+        [POSITION0, Hlsl, Glsl]
         public vec4 Position;
-        [COLOR0, Hlsl]
+        [COLOR0, Hlsl, Glsl]
         public color Color;
-        [TEXCOORD0, Hlsl]
+        [TEXCOORD0, Hlsl, Glsl]
         public vec2 TexCoords;
 
         VertexOut(vec4 Position, color Color, vec2 TexCoords)
@@ -206,7 +210,7 @@ namespace FragSharpFramework
             this.TexCoords = TexCoords;
         }
 
-        [Hlsl("(VertexToPixel)0", TranslationType.ReplaceExpression)]
+        [Hlsl("(VertexToPixel)0", TranslationType.ReplaceExpression), Glsl("(VertexToPixel)0", TranslationType.ReplaceExpression)]
         public static readonly VertexOut Zero = new VertexOut(vec4.Zero, color.TransparentBlack, vec2.Zero);
     }
 
@@ -218,13 +222,13 @@ namespace FragSharpFramework
 
     public struct Vertex
     {
-        [POSITION0, Hlsl("inPos", TranslationType.ReplaceExpression)]
+        [POSITION0, Hlsl("inPos", TranslationType.ReplaceExpression), Glsl("inPos", TranslationType.ReplaceExpression)]
         public vec3 Position;
 
-        [COLOR0, Hlsl("inColor", TranslationType.ReplaceExpression)]
+        [COLOR0, Hlsl("inColor", TranslationType.ReplaceExpression), Glsl("inColor", TranslationType.ReplaceExpression)]
         public color Color;
 
-        [TEXCOORD0, Hlsl("inTexCoords", TranslationType.ReplaceExpression)]
+        [TEXCOORD0, Hlsl("inTexCoords", TranslationType.ReplaceExpression), Glsl("inTexCoords", TranslationType.ReplaceExpression)]
         public vec2 TextureCoordinate;
 
         Vertex(vec3 Position, color Color, vec2 TextureCoordinate)
@@ -241,16 +245,16 @@ namespace FragSharpFramework
     /// </summary>
     public class FragSharpStd
     {
-        [Hlsl("float2")]
+        [Hlsl("float2"), Glsl("vec2")]
         protected static vec2 vec(float x, float y)                   { return new vec2(x, y);       }
 
-        [Hlsl("float3")]
+        [Hlsl("float3"), Glsl("vec3")]
         protected static vec3 vec(float x, float y, float z)          { return new vec3(x, y, z);    }
 
-        [Hlsl("float4")]
+        [Hlsl("float4"), Glsl("vec4")]
         protected static vec4 vec(float x, float y, float z, float w) { return new vec4(x, y, z, w); }
 
-        [Hlsl("float4")]
+        [Hlsl("float4"), Glsl("vec4")]
         protected static color rgba(float x, float y, float z, float w) { return new color(x, y, z, w); }
 
         [Special(Special.rgba_hex)]
@@ -286,7 +290,7 @@ namespace FragSharpFramework
             DownLeft  = new RelativeIndex(-1,-1),
             Here      = new RelativeIndex( 0, 0);
 
-        [Hlsl("tex2D")]
+        [Hlsl("tex2D"), Glsl("texture2D")]
         protected static color texture_lookup(Sampler s, vec2 coordinates)
         {
             coordinates *= s.Size;
@@ -381,58 +385,59 @@ namespace FragSharpFramework
             return floor(255 * v) * _1;
         }
 
-        [Hlsl("floor")]
+        [Hlsl("floor"), Glsl("floor")]
         public static float floor(float value)
         {
             return (float)Math.Floor(value);
         }
 
-        [Hlsl("floor")] public static vec2 floor(vec2 v) { return vec(floor(v.x), floor(v.y)); }
-        [Hlsl("floor")] public static vec3 floor(vec3 v) { return vec(floor(v.x), floor(v.y), floor(v.z)); }
-        [Hlsl("floor")] public static vec4 floor(vec4 v) { return vec(floor(v.x), floor(v.y), floor(v.z), floor(v.w)); }
+        // TODO: check that all of these math operations are valid in GLSL
+        [Hlsl("floor"), Glsl("floor")] public static vec2 floor(vec2 v) { return vec(floor(v.x), floor(v.y)); }
+        [Hlsl("floor"), Glsl("floor")] public static vec3 floor(vec3 v) { return vec(floor(v.x), floor(v.y), floor(v.z)); }
+        [Hlsl("floor"), Glsl("floor")] public static vec4 floor(vec4 v) { return vec(floor(v.x), floor(v.y), floor(v.z), floor(v.w)); }
 
-
+        // NOTE: What is this next function?
         [Hlsl("a")]
         public static float ceiling(float value)
         {
             return (float)Math.Ceiling(value);
         }
 
-        [Hlsl("ceiling")]
+        [Hlsl("ceiling"), Glsl("ceil")]
         public static vec2 ceiling(vec2 v) { return vec(ceiling(v.x), ceiling(v.y)); }
-        [Hlsl("ceiling")]
+        [Hlsl("ceiling"), Glsl("ceil")]
         public static vec3 ceiling(vec3 v) { return vec(ceiling(v.x), ceiling(v.y), ceiling(v.z)); }
-        [Hlsl("ceiling")]
+        [Hlsl("ceiling"), Glsl("ceil")]
         public static vec4 ceiling(vec4 v) { return vec(ceiling(v.x), ceiling(v.y), ceiling(v.z), ceiling(v.w)); }
 
 
-        [Hlsl("round")]
+        [Hlsl("round"), Glsl("round")]
         public static float round(float value)
         {
             return floor(value + .5f);
         }
 
-        [Hlsl("round")]
+        [Hlsl("round"), Glsl("round")]
         public static vec2 round(vec2 v) { return vec(round(v.x), round(v.y)); }
-        [Hlsl("round")]
+        [Hlsl("round"), Glsl("round")]
         public static vec3 round(vec3 v) { return vec(round(v.x), round(v.y), round(v.z)); }
-        [Hlsl("round")]
+        [Hlsl("round"), Glsl("round")]
         public static vec4 round(vec4 v) { return vec(round(v.x), round(v.y), round(v.z), round(v.w)); }
 
 
-        [Hlsl("length")]
+        [Hlsl("length"), Glsl("length")]
         protected static float length(vec2 v)
         {
             return (float)Math.Sqrt(v.x * v.x + v.y * v.y);
         }
 
-        [Hlsl("length")]
+        [Hlsl("length"), Glsl("length")]
         protected static float length(vec3 v)
         {
             return (float)Math.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
         }
 
-        [Hlsl("length")]
+        [Hlsl("length"), Glsl("length")]
         protected static float length(vec4 v)
         {
             return (float)Math.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
@@ -455,40 +460,44 @@ namespace FragSharpFramework
         }
 
 
-        [Hlsl("cos")]
+        [Hlsl("cos"), Glsl("cos")]
         protected static float cos(float angle)
         {
             return (float)Math.Cos((float)angle);
         }
 
-        [Hlsl("cos")] protected static vec2 cos(vec2 v) { return vec(cos(v.x), cos(v.y)); }
-        [Hlsl("cos")] protected static vec3 cos(vec3 v) { return vec(cos(v.x), cos(v.y), cos(v.z)); }
-        [Hlsl("cos")] protected static vec4 cos(vec4 v) { return vec(cos(v.x), cos(v.y), cos(v.z), cos(v.w)); }
+        [Hlsl("cos"), Glsl("cos")]
+        protected static vec2 cos(vec2 v) { return vec(cos(v.x), cos(v.y)); }
+        [Hlsl("cos"), Glsl("cos")]
+        protected static vec3 cos(vec3 v) { return vec(cos(v.x), cos(v.y), cos(v.z)); }
+        [Hlsl("cos"), Glsl("cos")]
+        protected static vec4 cos(vec4 v) { return vec(cos(v.x), cos(v.y), cos(v.z), cos(v.w)); }
 
 
-        [Hlsl("sin")]
+        [Hlsl("sin"), Glsl("sin")]
         protected static float sin(float angle)
         {
             return (float)Math.Sin((float)angle);
         }
 
-        [Hlsl("sin")] protected static vec2 sin(vec2 v) { return vec(sin(v.x), sin(v.y)); }
-        [Hlsl("sin")] protected static vec3 sin(vec3 v) { return vec(sin(v.x), sin(v.y), sin(v.z)); }
-        [Hlsl("sin")] protected static vec4 sin(vec4 v) { return vec(sin(v.x), sin(v.y), sin(v.z), sin(v.w)); }
+        [Hlsl("sin"), Glsl("sin")] protected static vec2 sin(vec2 v) { return vec(sin(v.x), sin(v.y)); }
+        [Hlsl("sin"), Glsl("sin")] protected static vec3 sin(vec3 v) { return vec(sin(v.x), sin(v.y), sin(v.z)); }
+        [Hlsl("sin"), Glsl("sin")] protected static vec4 sin(vec4 v) { return vec(sin(v.x), sin(v.y), sin(v.z), sin(v.w)); }
 
 
-        [Hlsl("abs")]
+        [Hlsl("abs"), Glsl("abs")]
         protected static float abs(float angle)
         {
             return (float)Math.Abs((float)angle);
         }
 
-        [Hlsl("abs")] protected static vec2 abs(vec2 v) { return vec(abs(v.x), abs(v.y)); }
-        [Hlsl("abs")] protected static vec3 abs(vec3 v) { return vec(abs(v.x), abs(v.y), abs(v.z)); }
-        [Hlsl("abs")] protected static vec4 abs(vec4 v) { return vec(abs(v.x), abs(v.y), abs(v.z), abs(v.w)); }
+        [Hlsl("abs"), Glsl("abs")]
+        protected static vec2 abs(vec2 v) { return vec(abs(v.x), abs(v.y)); }
+        [Hlsl("abs"), Glsl("abs")] protected static vec3 abs(vec3 v) { return vec(abs(v.x), abs(v.y), abs(v.z)); }
+        [Hlsl("abs"), Glsl("abs")] protected static vec4 abs(vec4 v) { return vec(abs(v.x), abs(v.y), abs(v.z), abs(v.w)); }
 
         
-        [Hlsl("fmod")]
+        [Hlsl("fmod"), Glsl("modf")]
         protected static float fmod(float dividend, float divider)
         {
             return (float)(dividend % divider);
@@ -498,31 +507,38 @@ namespace FragSharpFramework
         protected static vec3 fmod(vec3 dividend, float divider) { return vec(fmod(dividend.x, divider), fmod(dividend.y, divider), fmod(dividend.z, divider)); }
         protected static vec4 fmod(vec4 dividend, float divider) { return vec(fmod(dividend.x, divider), fmod(dividend.y, divider), fmod(dividend.z, divider), fmod(dividend.w, divider)); }
 
-        [Hlsl("fmod")] protected static vec2 fmod(vec2 dividend, vec2 divider) { return vec(fmod(dividend.x, divider.x), fmod(dividend.y, divider.y)); }
-        [Hlsl("fmod")] protected static vec3 fmod(vec3 dividend, vec3 divider) { return vec(fmod(dividend.x, divider.x), fmod(dividend.y, divider.y), fmod(dividend.z, divider.z)); }
-        [Hlsl("fmod")] protected static vec4 fmod(vec4 dividend, vec4 divider) { return vec(fmod(dividend.x, divider.x), fmod(dividend.y, divider.y), fmod(dividend.z, divider.z), fmod(dividend.w, divider.w)); }
+        [Hlsl("fmod"), Glsl("modf")]
+        protected static vec2 fmod(vec2 dividend, vec2 divider) { return vec(fmod(dividend.x, divider.x), fmod(dividend.y, divider.y)); }
+        [Hlsl("fmod"), Glsl("modf")]
+        protected static vec3 fmod(vec3 dividend, vec3 divider) { return vec(fmod(dividend.x, divider.x), fmod(dividend.y, divider.y), fmod(dividend.z, divider.z)); }
+        [Hlsl("fmod"), Glsl("modf")]
+        protected static vec4 fmod(vec4 dividend, vec4 divider) { return vec(fmod(dividend.x, divider.x), fmod(dividend.y, divider.y), fmod(dividend.z, divider.z), fmod(dividend.w, divider.w)); }
 
 
-        [Hlsl("atan2")]
+        // TODO: in Glsl the order of arguments is reveresed
+        [Hlsl("atan2"), Glsl("atan", TranslationType.ReverseArguments)]
         protected static float atan(float y, float x)
         {
             return (float)Math.Atan2(y, x);
         }
 
-        [Hlsl("atan2")] protected static vec2 atan2(vec2 y, vec2 x) { return vec(atan(y.x, x.x), atan(y.y, x.y)); }
-        [Hlsl("atan2")] protected static vec3 atan2(vec3 y, vec3 x) { return vec(atan(y.x, x.x), atan(y.y, x.y), atan(y.z, x.z)); }
-        [Hlsl("atan2")] protected static vec4 atan2(vec4 y, vec4 x) { return vec(atan(y.x, x.x), atan(y.y, x.y), atan(y.z, x.z), atan(y.w, x.w)); }
+        [Hlsl("atan2"), Glsl("atan")]
+        protected static vec2 atan2(vec2 y, vec2 x) { return vec(atan(y.x, x.x), atan(y.y, x.y)); }
+        [Hlsl("atan2"), Glsl("atan")]
+        protected static vec3 atan2(vec3 y, vec3 x) { return vec(atan(y.x, x.x), atan(y.y, x.y), atan(y.z, x.z)); }
+        [Hlsl("atan2"), Glsl("atan")]
+        protected static vec4 atan2(vec4 y, vec4 x) { return vec(atan(y.x, x.x), atan(y.y, x.y), atan(y.z, x.z), atan(y.w, x.w)); }
 
 
-        [Hlsl("max")]
+        [Hlsl("max"), Glsl("max")]
         protected static float max(float a, float b)
         {
             return (float)Math.Max(a, b);
         }
 
-        [Hlsl("max")] protected static vec2 max(vec2 a, vec2 b) { return vec(max(a.x, b.x), max(a.y, b.y)); }
-        [Hlsl("max")] protected static vec3 max(vec3 a, vec3 b) { return vec(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z)); }
-        [Hlsl("max")] protected static vec4 max(vec4 a, vec4 b) { return vec(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z), max(a.w, b.w)); }
+        [Hlsl("max"), Glsl("max")] protected static vec2 max(vec2 a, vec2 b) { return vec(max(a.x, b.x), max(a.y, b.y)); }
+        [Hlsl("max"), Glsl("max")] protected static vec3 max(vec3 a, vec3 b) { return vec(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z)); }
+        [Hlsl("max"), Glsl("max")] protected static vec4 max(vec4 a, vec4 b) { return vec(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z), max(a.w, b.w)); }
 
         protected static float max(float a, float b, float c) { return max(max(a, b), c); }
         protected static vec2  max(vec2  a, vec2  b, vec2  c) { return max(max(a, b), c); }
@@ -535,15 +551,15 @@ namespace FragSharpFramework
         protected static vec4  max(vec4  a, vec4  b, vec4  c, vec4  d) { return max(max(a,b), max(c,d)); }
 
 
-        [Hlsl("min")]
+        [Hlsl("min"), Glsl("min")]
         protected static float min(float a, float b)
         {
             return (float)Math.Min(a, b);
         }
 
-        [Hlsl("min")] protected static vec2 min(vec2 a, vec2 b) { return vec(min(a.x, b.x), min(a.y, b.y)); }
-        [Hlsl("min")] protected static vec3 min(vec3 a, vec3 b) { return vec(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z)); }
-        [Hlsl("min")] protected static vec4 min(vec4 a, vec4 b) { return vec(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z), min(a.w, b.w)); }
+        [Hlsl("min"), Glsl("min")] protected static vec2 min(vec2 a, vec2 b) { return vec(min(a.x, b.x), min(a.y, b.y)); }
+        [Hlsl("min"), Glsl("min")] protected static vec3 min(vec3 a, vec3 b) { return vec(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z)); }
+        [Hlsl("min"), Glsl("min")] protected static vec4 min(vec4 a, vec4 b) { return vec(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z), min(a.w, b.w)); }
 
         protected static float min(float a, float b, float c) { return min(min(a, b), c); }
         protected static vec2  min(vec2  a, vec2  b, vec2  c) { return min(min(a, b), c); }
