@@ -20,6 +20,9 @@ using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
 namespace FragSharp
 {
+    /// <summary>
+    /// A public class for runtime options like shader language
+    /// </summary>
     public class Options
     {
         public static string ShaderLanguage = "Hlsl";
@@ -52,6 +55,9 @@ namespace FragSharp
     }
 
     // NOTE: there is another TranslationType enum defined in FragSharpFramework Attributes.cs and it seems to be disconnected from this
+    /// <summary>
+    /// The set of possible ways that an expression can be translated to shader language.
+    /// </summary>
     public enum TranslationType { ReplaceMember, ReplaceExpression, UnderscoreAppend, ReverseArguments };
     public struct MapInfo
     {
@@ -65,10 +71,18 @@ namespace FragSharp
         }
     }
 
+    /// <summary>
+    /// Public class which maintains expression translations from C# to shader langauges
+    /// </summary>
     public static class TranslationLookup
     {
         public static Dictionary<Symbol, MapInfo> SymbolMap = new Dictionary<Symbol, MapInfo>();
 
+        /// <summary>
+        /// Looks up a symbol in SymbolMap recusively. Returns null if not found
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
         public static MapInfo RecursiveLookup(TypeSymbol symbol)
         {
             if (SymbolMap.ContainsKey(symbol))
@@ -89,6 +103,10 @@ namespace FragSharp
             Console.Write(0);
         }
 
+        /// <summary>
+        /// Processes typemap, adding members to SymbolMap.
+        /// </summary>
+        /// <param name="typemap"></param>
         static void ProcessTypeMap(NamedTypeSymbol typemap)
         {
             var members = typemap.GetMembers();
@@ -110,6 +128,11 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Processes Nodes, adding attributes to SymbolMap, unless attribute is TypeMap, then it adds the attributes members to SymbolMap.
+        /// </summary>
+        /// <param name="Models"></param>
+        /// <param name="Nodes"></param>
         public static void ProcessTypes(Dictionary<SyntaxTree, SemanticModel> Models, IEnumerable<SyntaxNode> Nodes)
         {
             var classes = Nodes.OfType<TypeDeclarationSyntax>();
@@ -135,6 +158,11 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Adds members to SymbolMap along with translation info from shader langague attributes
+        /// </summary>
+        /// <param name="member"></param>
+        /// <param name="attribute"></param>
         private static void CreateMapEntry(Symbol member, AttributeData attribute)
         {
             var args = attribute.ConstructorArguments.ToList();
@@ -152,6 +180,11 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Processes all nodes which are classes, looking them up in Models, and adding their members to SymbolMap.
+        /// </summary>
+        /// <param name="Models"></param>
+        /// <param name="Nodes"></param>
         public static void ProcessMembers(Dictionary<SyntaxTree, SemanticModel> Models, IEnumerable<SyntaxNode> Nodes)
         {
             var classes = Nodes.OfType<TypeDeclarationSyntax>();
@@ -180,6 +213,14 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Loops through Nodes which are classes, gets their members. Loops through members. 
+        /// If member is as definition, a FieldSymbol, and is readonly and has a non-null declaration initializer value it's translation is looked up. 
+        /// If that is non-null it is added to SymbolMap. 
+        /// </summary>
+        /// <param name="Models"></param>
+        /// <param name="Nodes"></param>
+        /// <param name="Compilation"></param>
         public static void ProcessReadonlys(Dictionary<SyntaxTree, SemanticModel> Models, IEnumerable<SyntaxNode> Nodes, Compilation Compilation)
         {
             var classes = Nodes.OfType<TypeDeclarationSyntax>();
@@ -236,6 +277,9 @@ namespace FragSharp
         }
     }
 
+    /// <summary>
+    /// Public class for holding filepaths for writing out generates and compiled shaders.
+    /// </summary>
     class Paths
     {
         public readonly string
@@ -260,6 +304,9 @@ namespace FragSharp
         }
     }
 
+    /// <summary>
+    /// Class which corresponds to a specific shader file. Infers spcializations (possible paths of branching logic) and generates shader code and boilerplate.
+    /// </summary>
     class ShaderClass : RoslynHelper
     {
         public static List<ShaderClass> Shaders = new List<ShaderClass>();
@@ -274,6 +321,12 @@ namespace FragSharp
         Dictionary<SyntaxTree, SemanticModel> Models;
         Compilation SourceCompilation;
 
+        /// <summary>
+        /// Checks if SymbolLookup contains symbol. If not found it creates a new ShaderClass from symbol, Models, and SourceCompilation and adds it to SymbolLookup as well as Shaders.
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="Models"></param>
+        /// <param name="SourceCompilation"></param>
         public static void AddShader(NamedTypeSymbol symbol, Dictionary<SyntaxTree, SemanticModel> Models, Compilation SourceCompilation)
         {
             if (!SymbolLookup.ContainsKey(symbol))
@@ -285,6 +338,12 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Constructor of ShaderClass. Builds dictionaries of syntax nodes and nodes which are methods from a dictionary of syntax trees and semantic models.
+        /// </summary>
+        /// <param name="symbol">The symbol which was the root of the shader.</param>
+        /// <param name="Models">The SyntaxTree, SemanticModel dictionary for the shader.</param>
+        /// <param name="SourceCompilation">The source compilation which defined the shader.</param>
         ShaderClass(NamedTypeSymbol symbol, Dictionary<SyntaxTree, SemanticModel> Models, Compilation SourceCompilation)
         {
             Symbol = symbol;
@@ -304,7 +363,13 @@ namespace FragSharp
 
         public NamedTypeSymbol Symbol;
 
+        /// <summary>
+        /// Nodes of the syntax tree of the shader
+        /// </summary>
         public List<SyntaxNode> Nodes;
+        /// <summary>
+        /// Nodes of the shader's syntax tree which are methods.
+        /// </summary>
         public List<MethodDeclarationSyntax> Methods;
 
         public ShaderClass BaseClass;
@@ -313,6 +378,9 @@ namespace FragSharp
 
         public List<Dictionary<Symbol, string>> Specializations = new List<Dictionary<Symbol, string>>();
 
+        /// <summary>
+        /// Gets baseclass of shader, and vertex and fragment declerations.
+        /// </summary>
         public void Setup()
         {
             GetBaseClass();
@@ -320,6 +388,11 @@ namespace FragSharp
             GetFragmentShaderDecleration();
         }
 
+        /// <summary>
+        /// Generates a suffix for a shader name for a specific specialization
+        /// </summary>
+        /// <param name="specialization"></param>
+        /// <returns></returns>
         public static string SpecializationVarSuffix(Dictionary<Symbol, string> specialization)
         {
             string suffix = "";
@@ -331,6 +404,11 @@ namespace FragSharp
             return suffix;
         }
 
+        /// <summary>
+        /// Generates a filename for a specific specialized version of a shader
+        /// </summary>
+        /// <param name="specialization"></param>
+        /// <returns></returns>
         public string SpecializationFileName(Dictionary<Symbol, string> specialization)
         {
             string suffix = "";
@@ -342,6 +420,11 @@ namespace FragSharp
             return Symbol.Name + suffix;
         }
 
+        /// <summary>
+        /// Writes "Content.Load" commands for all specializations to BoilerWriter.
+        /// </summary>
+        /// <param name="BoilerWriter"></param>
+        /// <param name="Tab"></param>
         public void WriteLoadCode(StringWriter BoilerWriter, string Tab)
         {
             if (!IsValidShader()) return;
@@ -354,6 +437,11 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Compiles all specializations and writes them to a shader file. Adds the boilerplate from the compilization to the BoilerWriter.
+        /// </summary>
+        /// <param name="BoilerWriter"></param>
+        /// <param name="CompileDir"></param>
         public void CompileAndWrite(StringWriter BoilerWriter, string CompileDir)
         {
             if (!IsValidShader()) return;
@@ -372,7 +460,13 @@ namespace FragSharp
                 BoilerWriter.WriteLine();
             }
         }
-
+        
+        /// <summary>
+        /// Creates a new ShaderWriter, compiles it. Returns a new ShaderCompilaion which has a non-null boilerplate if CompileBoilerplate is true.
+        /// </summary>
+        /// <param name="specialization"></param>
+        /// <param name="CompileBoilerplate"></param>
+        /// <returns></returns>
         public ShaderCompilation Compile(Dictionary<Symbol, string> specialization, bool CompileBoilerplate)
         {
             if (!IsValidShader()) return null;
@@ -399,6 +493,10 @@ namespace FragSharp
             return new ShaderCompilation(fragment, boilerplate);
         }
 
+        /// <summary>
+        /// Checks that shader has non-null vertex and fragment shader declerations.
+        /// </summary>
+        /// <returns></returns>
         private bool IsValidShader()
         {
             return VertexShaderDecleration != null && FragmentShaderDecleration != null;
@@ -426,18 +524,21 @@ namespace FragSharp
 
             var vertex_shaders = Methods.Where(method => HasAttribute(method, "VertexShader")).ToList();
 
+            // If there are any (possibly multiple) vertex shaders declared, take the first one
             if (vertex_shaders.Count > 0)
             {
                 VertexShaderDecleration = vertex_shaders[0];
                 return VertexShaderDecleration;
             }
 
+            // If there isn't a vertex shader defined, check the base class
             if (GetBaseClass() != null)
             {
                 VertexShaderDecleration = BaseClass.GetVertexShaderDecleration();
                 return VertexShaderDecleration;
             }
 
+            // Otherwise, just give up and set it to null
             VertexShaderDecleration = null;
             return null;
         }
@@ -474,6 +575,9 @@ namespace FragSharp
                 attribute => attribute.Name.ToString() == AttributeName));
         }
 
+        /// <summary>
+        /// Gets fragment arguments which are specializations so that each branch of the conditional can be and independant shader
+        /// </summary>
         public void GetSpecializations()
         {
             if (!IsValidShader()) return;
@@ -558,10 +662,24 @@ namespace FragSharp
         const string ExtensionFileName = "__ExtensionBoilerplate.cs";
         const string BoilerplateFileName = "__ShaderBoilerplate.cs";
 
+        /// <summary>
+        /// Dictionary of syntax trees from SourceCompilation
+        /// </summary>
         static Dictionary<SyntaxTree, SemanticModel> Models;
+        /// <summary>
+        /// Compilation of source code from build path.
+        /// </summary>
         static Compilation SourceCompilation;
+        /// <summary>
+        /// List of nodes from SourceCompilations
+        /// </summary>
         static List<SyntaxNode> Nodes;
 
+        /// <summary>
+        /// Returns true is symbol is a shader or has a BaseTYpe of FragSharpFramework.FragSharpStd
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
         static bool IsShader(this NamedTypeSymbol symbol)
         {
             if (symbol.BaseType == null) return false;
@@ -570,11 +688,24 @@ namespace FragSharp
                     symbol.BaseType.IsShader();
         }
 
+        /// <summary>
+        /// Given a syntax node, this retreives it's semantic model from the Models property (dictionary)
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         static SemanticModel Model(SyntaxNode node)
         {
             return Models[node.SyntaxTree];
         }
 
+        // TODO: I can see in WAL that [GLSL("vec4")] attributes are ending up [GLSL("<class name>")] in __ExtensionBoilerplate.cs. seems to be a bug
+        /// <summary>
+        /// Writes file __ExtensionBoilerplate which contains all of the namespaces and public structures/classes and methods. 
+        /// Returns true if __ExtensionBoilerplate.cs was changed.
+        /// </summary>
+        /// <param name="Models"></param>
+        /// <param name="Nodes"></param>
+        /// <returns></returns>
         static bool CreateExtensionBoilerplate(Dictionary<SyntaxTree, SemanticModel> Models, IEnumerable<SyntaxNode> Nodes)
         {
             StringWriter writer = new StringWriter();
@@ -669,16 +800,32 @@ using FragSharpFramework;
             return true;
         }
 
+        /// <summary>
+        /// Gets the "Vals" attribute of a type decalaration.
+        /// </summary>
+        /// <param name="_class"></param>
+        /// <returns></returns>
         static AttributeSyntax GetValsAttribute(TypeDeclarationSyntax _class)
         {
             return GetAttribute(_class, "Vals");
         }
 
+        /// <summary>
+        /// Gets the copy attribute of a type declaration.
+        /// </summary>
+        /// <param name="_class"></param>
+        /// <returns></returns>
         static AttributeSyntax GetCopyAttribute(TypeDeclarationSyntax _class)
         {
             return GetAttribute(_class, "Copy");
         }
 
+        /// <summary>
+        /// Given _class, loops through child nodes. For each child node which is a non-null AttributeListSyntax, loops through attributes. Returns name of first attribute found in this way.
+        /// </summary>
+        /// <param name="_class"></param>
+        /// <param name="AttributeName"></param>
+        /// <returns></returns>
         static AttributeSyntax GetAttribute(TypeDeclarationSyntax _class, string AttributeName)
         {
             foreach (var node in _class.ChildNodes())
@@ -699,6 +846,10 @@ using FragSharpFramework;
             return null;
         }
 
+        /// <summary>
+        /// Parses command line arguments. If none are provided, defaults to hard coded values for source fir, output dir, and configuration
+        /// </summary>
+        /// <param name="args"></param>
         static void ParseArgs(string[] args)
         {
             if (args.Length < 3)
@@ -996,6 +1147,9 @@ using FragSharpFramework;
             }
         }
 
+        /// <summary>
+        /// Loads project specified in build paths, parses with Roslyn, and sets Nodes and Models properties, corresponding to the nodes of the syntax trees and syntax trees respectively.
+        /// </summary>
         static void CompileUserCode()
         {
             //// Get all the relevant source files
@@ -1046,6 +1200,11 @@ using FragSharpFramework;
             }
         }
 
+        /// <summary>
+        /// Prints the syntax tree (from Roslyn) to the console for a given node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="indent"></param>
         static void PrintTree(SyntaxNodeOrToken node, string indent = "")
         {
             using (var writer = new StringWriter())
@@ -1055,6 +1214,12 @@ using FragSharpFramework;
             }
         }
 
+        /// <summary>
+        /// Given a syntax node or token and an output, generates a text representation of the syntax tree and writes it to the output.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="output"></param>
+        /// <param name="indent"></param>
         static void WriteTree(SyntaxNodeOrToken node, StringWriter output, string indent = "")
         {
             var nodes = node.ChildNodesAndTokens();
@@ -1083,7 +1248,14 @@ using FragSharpFramework;
         {
             return true;
         }
-
+        
+        /// <summary>
+        /// Recusively gets all nodes in a syntax tree
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="node"></param>
+        /// <param name="methods"></param>
+        /// <returns></returns>
         static List<T> GetNodes<T>(SyntaxNodeOrToken node, List<T> methods = null) where T : class
         {
             if (methods == null)

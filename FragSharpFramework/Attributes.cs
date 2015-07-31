@@ -7,14 +7,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace FragSharpFramework
 {
+    /// <summary>
+    /// The set of possible ways that an expression can be translated to shader language.
+    /// </summary>
     public enum TranslationType { ReplaceMember, ReplaceExpression, UnderscoreAppend, ReverseArguments };
 
+    // NOTE: I'm the only one who finds the Vals class with attribute methods and a Vals attribute method confusing?
     public class Vals
     {
         [Vals(true, false)] public class BoolAttribute : Attribute { }
         public static readonly bool[] Bool = new bool[] { true, false };
     }
 
+    /// <summary>
+    /// ValsAttributes designated "specializations"; arguments which can be factored out of shaders to improve performance
+    /// </summary>
     public class ValsAttribute : Attribute
     {
         public ValsAttribute(params int[] vals) { }
@@ -37,6 +44,9 @@ namespace FragSharpFramework
         public SpecialAttribute(Special name) { }
     }
 
+    /// <summary>
+    /// Base class for shader translation attributes.
+    /// </summary>
     public class __slAttribute : Attribute
     {
         public __slAttribute() { }
@@ -44,6 +54,9 @@ namespace FragSharpFramework
         public __slAttribute(string translation, TranslationType translation_type) { }
     }
 
+    /// <summary>
+    /// Attributes which define how an expression gets translated to HLSL
+    /// </summary>
     public class HlslAttribute : __slAttribute
     {
         public HlslAttribute() : base() { }
@@ -51,6 +64,9 @@ namespace FragSharpFramework
         public HlslAttribute(string translation, TranslationType translation_type) : base(translation, translation_type) { }
     }
 
+    /// <summary>
+    /// Attributes which define how an expression gets translated to GLSL
+    /// </summary>
     public class GlslAttribute : __slAttribute
     {
         public GlslAttribute() : base() { }
