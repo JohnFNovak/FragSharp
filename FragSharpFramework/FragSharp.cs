@@ -128,9 +128,10 @@ namespace FragSharpFramework
         }
 
         public const string SizeSuffix = "size", DxDySuffix = "dxdy";
-        // TODO: It's not clear to me what this does, but I may need to add Glsl attribute tags
-        [Hlsl(SizeSuffix, TranslationType.UnderscoreAppend)] public vec2 Size;
-        [Hlsl(DxDySuffix, TranslationType.UnderscoreAppend)] public vec2 DxDy;
+        [Hlsl(SizeSuffix, TranslationType.UnderscoreAppend), Glsl(SizeSuffix, TranslationType.UnderscoreAppend)]
+        public vec2 Size;
+        [Hlsl(DxDySuffix, TranslationType.UnderscoreAppend), Glsl(DxDySuffix, TranslationType.UnderscoreAppend)]
+        public vec2 DxDy;
 
         public int Width, Height;
         public Texture2D Texture;
