@@ -12,6 +12,9 @@ using FragSharpFramework;
 
 namespace FragSharp
 {
+    /// <summary>
+    /// This class handles actually writing generated shader code (not C#). (I think. AbstractCodeWriter might be what actually does that)
+    /// </summary>
     internal class GlslWriter : CStyleWriter
     {
         public GlslWriter(Dictionary<SyntaxTree, SemanticModel> models, Compilation compilation)
@@ -24,12 +27,16 @@ namespace FragSharp
         {
         }
 
+        // NOTE: Fields -> samplers.... what the hell is this?
+        /// <summary>
+        /// This compiles shader code for method parameters, treating samplers as a special case. If parameter is a "ref" it is prepended with "inout".
+        /// </summary>
+        /// <param name="parameter"></param>
         override protected void CompileMethodParameter(ParameterSyntax parameter)
         {
             // Check if symbol is a shader variable
             if (IsSampler(parameter))
             {
-                // TODO: Figure out what the deal is here. Sampler.*Suffix isn't implemented for Glsl (yet?) and I'm pretty sure the syntax is wrong
                 Write("sampler2D {0}, vec2 {0}_{1}, vec2 {0}_{2}", parameter.Identifier.ValueText, Sampler.SizeSuffix, Sampler.DxDySuffix);
             }
             else
@@ -44,6 +51,10 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Compiles shader code for syntax types. If type has a tranlation (from it's attributes), otherwise it is assumes that the type given is valid, and only writes it if it is "void".
+        /// </summary>
+        /// <param name="type"></param>
         override protected void CompileType(TypeSyntax type)
         {
             var info = GetModel(type).GetSymbolInfo(type);
@@ -70,6 +81,10 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Compiles shader code for a literal object (int, float, bool, etc) given as value. If value if floating precision, this insures that it at least has a trailing "0.1".
+        /// </summary>
+        /// <param name="value"></param>
         override protected void CompileLiteral(object value)
         {
             if (value is int)
@@ -92,6 +107,10 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Compiles shader code for element access expressions (vec2, ...?). I'm not actually sure what those are.
+        /// </summary>
+        /// <param name="expression"></param>
         override protected void CompileElementAccessExpression(ElementAccessExpressionSyntax expression)
         {
             var argument = expression.ArgumentList.Arguments[0];
@@ -325,6 +344,11 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Generates the shader code for a default initialization <> = (<type>)0
+        /// </summary>
+        /// <param name="declarator"></param>
+        /// <param name="type"></param>
         override protected void CompileDefaultInitialization(VariableDeclaratorSyntax declarator, TypeSyntax type)
         {
             Write("=");

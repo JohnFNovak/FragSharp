@@ -8,6 +8,9 @@ using Roslyn.Compilers.CSharp;
 
 namespace FragSharp
 {
+    /// <summary>
+    /// This is the base class of all *Writer classes which build both the C# boilerplate and the shader code and write it to file.
+    /// </summary>
     internal abstract class AbstractCodeWriter : RoslynHelper, IDisposable
     {
         public AbstractCodeWriter(Dictionary<SyntaxTree, SemanticModel> models, Compilation compilation)

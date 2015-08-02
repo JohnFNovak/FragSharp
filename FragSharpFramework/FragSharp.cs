@@ -106,8 +106,7 @@ namespace FragSharpFramework
             }
         }
     }
-
-    // TODO: figure out what inherits from this and make sure that they are all using it in the 2d way.
+   
     [Hlsl("sampler"), Glsl("sampler2D")]
     public abstract class Sampler : FragSharpStd
     {
@@ -512,7 +511,6 @@ namespace FragSharpFramework
         protected static vec4 fmod(vec4 dividend, vec4 divider) { return vec(fmod(dividend.x, divider.x), fmod(dividend.y, divider.y), fmod(dividend.z, divider.z), fmod(dividend.w, divider.w)); }
 
 
-        // TODO: in Glsl the order of arguments is reveresed
         [Hlsl("atan2"), Glsl("atan", TranslationType.ReverseArguments)]
         protected static float atan(float y, float x)
         {

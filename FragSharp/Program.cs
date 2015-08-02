@@ -438,7 +438,7 @@ namespace FragSharp
         }
 
         /// <summary>
-        /// Compiles all specializations and writes them to a shader file. Adds the boilerplate from the compilization to the BoilerWriter.
+        /// Compiles all specializations and writes their shader files. Adds the boilerplate from the compilization to the BoilerWriter.
         /// </summary>
         /// <param name="BoilerWriter"></param>
         /// <param name="CompileDir"></param>
@@ -452,6 +452,7 @@ namespace FragSharp
 
                 var compiled = Compile(specialization, specialization == Specializations.Last());
 
+                // TODO: the '.fx' file ending is a HLSL thing. I don't know if this will need to change for GLSL
                 TargetFile = Path.Combine(CompileDir, name) + ".fx";
 
                 File.WriteAllText(TargetFile, compiled.Code);
@@ -576,7 +577,7 @@ namespace FragSharp
         }
 
         /// <summary>
-        /// Gets fragment arguments which are specializations so that each branch of the conditional can be and independant shader
+        /// Gets fragment arguments which are specializations so that the specialization arguments can be factored out to increase run speed
         /// </summary>
         public void GetSpecializations()
         {

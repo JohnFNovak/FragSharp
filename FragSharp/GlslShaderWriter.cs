@@ -11,6 +11,9 @@ using FragSharpFramework;
 namespace FragSharp
 {
 
+    /// <summary>
+    /// This class is responsible for generating the C# boilerplate which will be used to compile the generated FragSharp shaders.
+    /// </summary>
     internal class GlslShaderWriter : GlslWriter
     {
         public GlslShaderWriter(Dictionary<SyntaxTree, SemanticModel> models, Compilation compilation, Dictionary<Symbol, string> specialization)
@@ -23,7 +26,13 @@ namespace FragSharp
 
         int SamplerNumber = 0;
 
+        /// <summary>
+        /// Enumerates the possible types of methods which can be currently compiling: VertexeMethod, FragmentMethod, or None
+        /// </summary>
         enum Compiling { None, VertexMethod, FragmentMethod };
+        /// <summary>
+        /// What type of method is currently compiling. Defuaults to None.
+        /// </summary>
         Compiling CurrentMethod = Compiling.None;
 
         public string CompileShader(NamedTypeSymbol Symbol, MethodDeclarationSyntax vertex_method, MethodDeclarationSyntax fragment_method)
@@ -103,6 +112,10 @@ namespace FragSharp
             return fragment;
         }
 
+        /// <summary>
+        /// Loops over ReferencedForeignVars, calling CompileSamplerParameter_Foreign on each. Returns string of these compilations.
+        /// </summary>
+        /// <returns></returns>
         virtual protected string GetForeignVars()
         {
             string foreign_vars = string.Empty;
@@ -131,6 +144,12 @@ namespace FragSharp
             return foreign_vars;
         }
 
+        /// <summary>
+        /// For the given symbol and specializations, writes the namespace and makes call to generate class boilerplate string.
+        /// </summary>
+        /// <param name="Symbol"></param>
+        /// <param name="Specializations"></param>
+        /// <returns></returns>
         public string CompileShaderBoilerplate(NamedTypeSymbol Symbol, List<Dictionary<Symbol, string>> Specializations)
         {
             ClearString();
@@ -153,6 +172,11 @@ namespace FragSharp
 
         const string ApplyName = "Apply", UsingName = "Using";
 
+        /// <summary>
+        /// For the given symbol and specializations, generates the class declarations, signatures, and calls to apply functions for the shaders
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="Specializations"></param>
         void WriteBoilerplateClass(NamedTypeSymbol symbol, List<Dictionary<Symbol, string>> Specializations)
         {
             WriteLine("public partial class {0}", symbol.Name);
@@ -194,6 +218,11 @@ namespace FragSharp
             WriteLine("}");    
         }
 
+        /// <summary>
+        /// Given a function name and optional extra parameters, this writes the function signature.
+        /// </summary>
+        /// <param name="FunctionName"></param>
+        /// <param name="ExtraParams"></param>
         void WriteBoilerplateSignature(string FunctionName, string ExtraParams = null)
         {
             BeginLine("public static void {0}(", FunctionName);
@@ -216,6 +245,9 @@ namespace FragSharp
             EndLine(")");
         }
 
+        /// <summary>
+        /// Writes an invocation of UsingName, wrapping parameters from NonForeignParams.
+        /// </summary>
         void WriteInvokeUsing()
         {
             BeginLine("{0}(", UsingName);
@@ -233,6 +265,11 @@ namespace FragSharp
             EndLine(");");
         }
 
+        /// <summary>
+        /// This makes a call to write "SetRenderTarget" and "Clear" calls, then writes invocation of UsingName propety on all NonForeignParams. Also writes call to "GridHelper.DrawGrid".
+        /// </summary>
+        /// <param name="SetRenderTarget"></param>
+        /// <param name="ClearTarget"></param>
         void WriteBoilerplateApplyFunc(string SetRenderTarget, string ClearTarget)
         {
             WriteLine("{");
@@ -248,6 +285,11 @@ namespace FragSharp
             WriteLine("}");    
         }
 
+        /// <summary>
+        /// Given a render target and/or a clear target, this writes "SetRenderTarget" and "Clear" calls (from GridHelper.GraphicsDevice)
+        /// </summary>
+        /// <param name="SetRenderTarget"></param>
+        /// <param name="ClearTarget"></param>
         private void CodeFor_SetRender_Clear(string SetRenderTarget, string ClearTarget)
         {
             if (SetRenderTarget != null)
@@ -257,6 +299,11 @@ namespace FragSharp
                 WriteLine("GridHelper.GraphicsDevice.Clear({0});", ClearTarget);
         }
 
+        /// <summary>
+        /// This makes a call to write "SetRenderTarget" and "Clear" calls, then writes invocation of UsingName propety on all NonForeignParams. Also writes call to "GridHelper.DrawGrid".
+        /// </summary>
+        /// <param name="SetRenderTarget"></param>
+        /// <param name="ClearTarget"></param>
         void WriteBoilerplateUsingFuncOverload(string SetRenderTarget, string ClearTarget)
         {
             WriteLine("{");
@@ -297,6 +344,10 @@ namespace FragSharp
             WriteLine("}");
         }
 
+        /// <summary>
+        /// Given a specialization, this writes the if/else series which determines which specialized shader should be called.
+        /// </summary>
+        /// <param name="Specializations"></param>
         void WriteBoilerplateEffectChoice(List<Dictionary<Symbol, string>> Specializations)
         {
             if (Specializations.Count > 1)
@@ -318,6 +369,11 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Given a specialization, this generates equality statements for comparing argument values with specialization values. Important when comparing floating point numbers with epsilon precision.
+        /// </summary>
+        /// <param name="specialization"></param>
+        /// <returns></returns>
         string SpecializationEquality(Dictionary<Symbol, string> specialization)
         {
             string equality = "";
@@ -335,6 +391,10 @@ namespace FragSharp
             return equality;
         }
 
+        /// <summary>
+        /// Compiles the return statements of a fragment. If Compiling a VertexFragment or None, calls base.CompileReturnStatement for string.
+        /// </summary>
+        /// <param name="statement"></param>
         override protected void CompileReturnStatement(ReturnStatementSyntax statement)
         {
             if (CurrentMethod == Compiling.FragmentMethod)
@@ -356,7 +416,9 @@ namespace FragSharp
             return string.Format(s, Tab, LineBreak);
         }
 
-
+        /// <summary>
+        /// Class for parameters to vertex and fragment shaders.
+        /// </summary>
         class Param
         {
             public enum ParamType { VertexParam, FragmentParam };
@@ -394,6 +456,10 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Given a method (assumed to be a vertex shader), this loops over the method's parameters and compiles them.
+        /// </summary>
+        /// <param name="method"></param>
         void CompileVertexSignature(MethodDeclarationSyntax method)
         {
             var ParameterList = method.ParameterList.Parameters;
@@ -410,6 +476,11 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Given a method (assumed to be a fragment shader), loops over methods parameters. Adds first parameter to SignatureMap because it must be a VertexOut which maps to "psin". Compiles all parameters and writes those which are not specialized.
+        /// </summary>
+        /// <param name="method"></param>
+        /// <returns></returns>
         Dictionary<Symbol, string> CompileFragmentSignature(MethodDeclarationSyntax method)
         {
             var SignatureMap = new Dictionary<Symbol, string>(specialization);
@@ -452,6 +523,10 @@ namespace FragSharp
         const string VertexShaderParameterPrefix = "vs_param_";
         const string FragmentShaderParameterPrefix = "fs_param_";
 
+        /// <summary>
+        /// Given a parameter (assumed to be to a vertex shader), this looks up the parameters translation and name, adds it to Params and AllParams, and writes out it's declaration.
+        /// </summary>
+        /// <param name="parameter"></param>
         void CompileVertexParameter(ParameterSyntax parameter)
         {
             var info = GetModel(parameter).GetSymbolInfo(parameter.Type);
@@ -485,6 +560,11 @@ namespace FragSharp
             }
         }
 
+        /// <summary>
+        /// Given a parameter (assumed to be to a fragment shader), this looks up the parameters translation and name, adds it to AllParams. Also, if it's not a specialization, it adds it to Params and writes out it's declaration.
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <param name="specialized"></param>
         void CompileFragmentParameter(ParameterSyntax parameter, bool specialized)
         {
             var info = GetModel(parameter).GetSymbolInfo(parameter.Type);
@@ -549,13 +629,17 @@ namespace FragSharp
         {
             switch (type.Name)
             {
-                case "Wrap": return "Wrap";
-                case "Clamp": return "Clamp";
+                case "Wrap": return "GL_REPEAT";
+                case "Clamp": return "GL_CLAMP_TO_EDGE";
 
-                default: return "Point";
+                default: return "GL_CLAMP_TO_EDGE";
             }
         }
 
+        /// <summary>
+        /// Given a symbol which corresponds to a forgein sampler parameter, this generates the parameter declaration pointing to shaded memory addresses.
+        /// </summary>
+        /// <param name="symbol"></param>
         void CompileSamplerParameter_Foreign(Symbol symbol)
         {
             SamplerNumber++;
@@ -579,6 +663,11 @@ namespace FragSharp
             AllParams.Add(param);
         }
 
+        /// <summary>
+        /// This compiles a declaration for a sampler parameter which is not explicitly forgeign. In practice it doesn't matter, because the declaration points at shared memory addresses.
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <param name="symbol"></param>
         void CompileSamplerParameter(ParameterSyntax parameter, TypeSymbol symbol)
         {
             SamplerNumber++;
