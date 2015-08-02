@@ -618,10 +618,10 @@ namespace FragSharp
         {
             switch (type.Name)
             {
-                case "Linear": return "Linear";
-                case "Point": return "Point";
+                case "Linear": return "GL_LINEAR";
+                case "Point": return "GL_LINEAR_MIPMAP_LINEAR";
 
-                default: return "Point";
+                default: return "GL_LINEAR_MIPMAP_LINEAR";
             }
         }
 
@@ -689,22 +689,30 @@ namespace FragSharp
             AllParams.Add(param);
         }
 
-// TODO: figure out how to create and declare a Texture object in OpenGL
+        // TODO: deal with this note
+        /* NOTE:
+         * There seems to be two types of shaders we care about here: vertex shaders and fragment shaders.
+         * The way things are set up, we are already creating both types, but we are wrapping them up in a .fx file.
+         * ".fx" files are a HLSL thing, so we will need to figure out how to put together and compile GLSL files.
+         */
+
+        // NOTE: this may have problems, noteably: all TexParameter's are "i", I picked stuff at random for glTexImage2D, {2}_Texture has to be the right type, and I'm not sure on the "layout" syntax
 const string SamplerTemplate =
 @"// Texture Sampler for {2}, using register location {1}
 vec2 {2}_" + Sampler.SizeSuffix + @";
 vec2 {2}_" + Sampler.DxDySuffix + @";
+int {2}_width = {2}_" + Sampler.SizeSuffix + @"[0];
+int {2}_height = {2}_" + Sampler.SizeSuffix + @"[1];
 
-texture {2}_Texture;
-sampler2D {2} : register(s{1}) = sampler_state
-{{
-{0}texture   = <{2}_Texture>;
-{0}MipFilter = {7};
-{0}MagFilter = {6};
-{0}MinFilter = {5};
-{0}AddressU  = {3};
-{0}AddressV  = {4};
-}};";
+glGenTextures(1, &{2}_Texture);
+glBindTexture(GL_TEXTURE_2D, {2}_Texture);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIP_FILTER, {7}); 
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, {6});
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, {5}); 
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, {3});
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, {4});
+layout (binding = {1}) sampler2D {2}_Texture;
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, {2}_width, {2}_height, 0, GL_BGRA, GL_UNSIGNED_BYTE, &{2}_Texture);";
 
 const string ReferencedMethodsPreamble =
 @"// The following methods are included because they are referenced by the fragment shader.";
