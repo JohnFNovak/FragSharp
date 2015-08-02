@@ -254,11 +254,20 @@ namespace FragSharp
                                 try
                                 {
                                     //if (constructor != null)// && SymbolMap.ContainsKey(constructor))
-                                    // TODO: generalize to GLSL
-                                    var writer = new HlslWriter(Models, Compilation);
+                                    if (Options.ShaderLanguage == "Hlsl")
+                                    {
+                                        var writer = new HlslWriter(Models, Compilation);
 
-                                    writer.CompileExpression(creation);
-                                    translation = writer.GetString();
+                                        writer.CompileExpression(creation);
+                                        translation = writer.GetString();
+                                    }
+                                    else if (Options.ShaderLanguage == "Glsl")
+                                    {
+                                        var writer = new GlslWriter(Models, Compilation);
+
+                                        writer.CompileExpression(creation);
+                                        translation = writer.GetString();
+                                    }
                                 }
                                 catch (Exception e)
                                 {
@@ -472,26 +481,34 @@ namespace FragSharp
         {
             if (!IsValidShader()) return null;
 
-            /*// TODO: fix this bug
-            switch (Options.ShaderLanguage) {
-                case "Hlsl":
-                    HlslShaderWriter writer = new HlslShaderWriter(Models, SourceCompilation, specialization);
-                    break;
-                case "Glsl":
-                    GlslShaderWriter writer = new GlslShaderWriter(Models, SourceCompilation, specialization);
-                    break;
-            };*/
-            HlslShaderWriter writer = new HlslShaderWriter(Models, SourceCompilation, specialization);
-            
-            string fragment = writer.CompileShader(Symbol, VertexShaderDecleration, FragmentShaderDecleration);
-            
-            string boilerplate = null;
-            if (CompileBoilerplate)
-            {
-                boilerplate = writer.CompileShaderBoilerplate(Symbol, Specializations);
-            }
+            if (Options.ShaderLanguage == "Hlsl") {
+                HlslShaderWriter writer = new HlslShaderWriter(Models, SourceCompilation, specialization);
 
-            return new ShaderCompilation(fragment, boilerplate);
+                string fragment = writer.CompileShader(Symbol, VertexShaderDecleration, FragmentShaderDecleration);
+
+                string boilerplate = null;
+                if (CompileBoilerplate)
+                {
+                    boilerplate = writer.CompileShaderBoilerplate(Symbol, Specializations);
+                }
+
+                return new ShaderCompilation(fragment, boilerplate);
+            }
+            //else if (Options.ShaderLanguage == "Glsl")  // This is comented out because we have to be sure that Compile returns <emph> something </emph>
+            else
+            {
+                GlslShaderWriter writer = new GlslShaderWriter(Models, SourceCompilation, specialization);
+
+                string fragment = writer.CompileShader(Symbol, VertexShaderDecleration, FragmentShaderDecleration);
+
+                string boilerplate = null;
+                if (CompileBoilerplate)
+                {
+                    boilerplate = writer.CompileShaderBoilerplate(Symbol, Specializations);
+                }
+
+                return new ShaderCompilation(fragment, boilerplate);
+            }
         }
 
         /// <summary>
