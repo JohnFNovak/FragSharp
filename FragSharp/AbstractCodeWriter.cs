@@ -358,8 +358,7 @@ namespace FragSharp
 
             string translation = TranslationLookup.SymbolMap[type].Translation;
 
-            // TODO: This is Hlsl specific
-            return translation == "float2" || translation == "float3" || translation == "float4";
+            return translation == "float2" || translation == "float3" || translation == "float4" || translation == "vec2" || translation == "vec3" || translation == "vec4";
         }
 
         protected bool IsSampler(SyntaxNode param) { return IsSamplerType(GetType(GetSymbol(param))); }
