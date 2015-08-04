@@ -122,7 +122,7 @@ namespace FragSharp
 
             if (type != null && type.Name == "vec2")
             {
-                Write("tex2D(");
+                Write("texture2D(");
                 CompileExpression(expression.Expression);
                 Write(Comma);
                 CompileExpression(argument.Expression);
@@ -131,7 +131,7 @@ namespace FragSharp
             else if (type != null && type.Name == "RelativeIndex")
             {
                 // Without .5,.5 shift
-                Write("tex2D(");
+                Write("textrue2D(");
                 CompileExpression(expression.Expression);
                 Write(Comma);
                 Write("psin.TexCoords{0}+{0}(", Space);
@@ -141,7 +141,7 @@ namespace FragSharp
                 Write("_{0})", Sampler.DxDySuffix);
 
                 // With .5,.5 shift. This may be needed on some architectures due to rounding/interpolation issues.
-                //Write("tex2D(");
+                //Write("texture2D(");
                 //CompileExpression(expression.Expression);
                 //Write(Comma);
                 //Write("psin.TexCoords{0}+{0}(float2(.5,.5){0}+{0}(", Space);
@@ -153,13 +153,13 @@ namespace FragSharp
             }
             else
             {
-                //Write("tex2D(");
+                //Write("texture2D(");
                 //CompileExpression(expression.Expression);
                 //Write(Comma);
                 //Write("float2(2,1) * float2(1,1)/16.0)");
 
                 // Assume form [i, j]
-                Write("tex2D(");
+                Write("texture2D(");
                 CompileExpression(expression.Expression);
                 Write(Comma);
                 Write("vec2(", Space);
