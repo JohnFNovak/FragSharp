@@ -971,52 +971,37 @@ using FragSharpFramework;
 
             // Compile shaders from C# to target language
             StringWriter BoilerWriter = new StringWriter();
-            /*switch (Options.ShaderLanguage)
+            // TODO: deal with this
+            if (Options.ShaderLanguage == "Hlsl")
             {
-                case "Hlsl":
-                    BoilerWriter.WriteLine(HlslShaderWriter.BoilerFileBegin, Tab);
-                    BoilerWriter.WriteLine();
+                BoilerWriter.WriteLine(HlslShaderWriter.BoilerFileBegin, Tab);
+                BoilerWriter.WriteLine();
 
-                    BoilerWriter.WriteLine(HlslShaderWriter.BoilerBeginInitializer, Tab);
+                BoilerWriter.WriteLine(HlslShaderWriter.BoilerBeginInitializer, Tab);
 
-                    foreach (var shader in ShaderClass.Shaders)
-                    {
-                        shader.WriteLoadCode(BoilerWriter, Tab);
-                    }
+                foreach (var shader in ShaderClass.Shaders)
+                {
+                    shader.WriteLoadCode(BoilerWriter, Tab);
+                }
 
-                    BoilerWriter.WriteLine(HlslShaderWriter.BoilerEndInitializer, Tab);
-                    BoilerWriter.WriteLine();
-                    break;
-                case "Glsl":
-                    BoilerWriter.WriteLine(GlslShaderWriter.BoilerFileBegin, Tab);
-                    BoilerWriter.WriteLine();
-
-                    BoilerWriter.WriteLine(GlslShaderWriter.BoilerBeginInitializer, Tab);
-
-                    foreach (var shader in ShaderClass.Shaders)
-                    {
-                        shader.WriteLoadCode(BoilerWriter, Tab);
-                    }
-
-                    BoilerWriter.WriteLine(GlslShaderWriter.BoilerEndInitializer, Tab);
-                    BoilerWriter.WriteLine();
-                    break;
-                default:
-                    Console.WriteLine("Invalid Shader Langauge Selected: {0}", Options.ShaderLanguage);
-                    break;
-            }*/
-            BoilerWriter.WriteLine(HlslShaderWriter.BoilerFileBegin, Tab);
-            BoilerWriter.WriteLine();
-
-            BoilerWriter.WriteLine(HlslShaderWriter.BoilerBeginInitializer, Tab);
-
-            foreach (var shader in ShaderClass.Shaders)
+                BoilerWriter.WriteLine(HlslShaderWriter.BoilerEndInitializer, Tab);
+                BoilerWriter.WriteLine();
+            } 
+            else if (Options.ShaderLanguage == "Glsl")
             {
-                shader.WriteLoadCode(BoilerWriter, Tab);
+                BoilerWriter.WriteLine(GlslShaderWriter.BoilerFileBegin, Tab);
+                BoilerWriter.WriteLine();
+
+                BoilerWriter.WriteLine(GlslShaderWriter.BoilerBeginInitializer, Tab);
+
+                foreach (var shader in ShaderClass.Shaders)
+                {
+                    shader.WriteLoadCode(BoilerWriter, Tab);
+                }
+
+                BoilerWriter.WriteLine(GlslShaderWriter.BoilerEndInitializer, Tab);
+                BoilerWriter.WriteLine();
             }
-
-            BoilerWriter.WriteLine(HlslShaderWriter.BoilerEndInitializer, Tab);
-            BoilerWriter.WriteLine();
 
             foreach (var shader in ShaderClass.Shaders)
             {
