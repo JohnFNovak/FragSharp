@@ -54,7 +54,6 @@ namespace FragSharp
         }
     }
 
-    // NOTE: there is another TranslationType enum defined in FragSharpFramework Attributes.cs and it seems to be disconnected from this
     /// <summary>
     /// The set of possible ways that an expression can be translated to shader language.
     /// </summary>
@@ -461,7 +460,7 @@ namespace FragSharp
 
                 var compiled = Compile(specialization, specialization == Specializations.Last());
 
-                // TODO: the '.fx' file ending is a HLSL thing. I don't know if this will need to change for GLSL
+                // TODO: the '.fx' file ending is a Hlsl thing. I don't know if this will need to change for GLSL
                 TargetFile = Path.Combine(CompileDir, name) + ".fx";
 
                 File.WriteAllText(TargetFile, compiled.Code);
@@ -717,6 +716,7 @@ namespace FragSharp
         }
 
         // TODO: I can see in WAL that [GLSL("vec4")] attributes are ending up [GLSL("<class name>")] in __ExtensionBoilerplate.cs. seems to be a bug
+        // NOTE: I may have fixed this.
         /// <summary>
         /// Writes file __ExtensionBoilerplate which contains all of the namespaces and public structures/classes and methods. 
         /// Returns true if __ExtensionBoilerplate.cs was changed.
@@ -1105,6 +1105,9 @@ using FragSharpFramework;
             public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName, string assetName) { throw new NotImplementedException(); }
         }
 
+        /// <summary>
+        /// This is where the shader language files are actually written
+        /// </summary>
         static void BuildGeneratedShaders()
         {
             ContentBuilder contentBuilder = new ContentBuilder();

@@ -230,7 +230,7 @@ namespace FragSharp.Build
 
         /// <summary>
         /// Builds all the content files which have been added to the project,
-        /// dynamically creating .xnb files in the OutputDirectory.
+        /// dynamically creating .xf files in the OutputDirectory.
         /// Returns an error message if the build fails.
         /// </summary>
         public string Build()

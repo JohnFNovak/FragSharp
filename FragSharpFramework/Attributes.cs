@@ -55,7 +55,7 @@ namespace FragSharpFramework
     }
 
     /// <summary>
-    /// Attributes which define how an expression gets translated to HLSL
+    /// Attributes which define how an expression gets translated to Hlsl
     /// </summary>
     public class HlslAttribute : __slAttribute
     {

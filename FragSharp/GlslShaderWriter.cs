@@ -6,7 +6,7 @@ using Roslyn.Compilers.CSharp;
 
 using FragSharpFramework;
 
-// TODO: This file needs to actually be ported from HLSL to GLSL
+// TODO: This file needs to actually be ported from Hlsl to GLSL
 
 namespace FragSharp
 {
@@ -693,7 +693,7 @@ namespace FragSharp
         /* NOTE:
          * There seems to be two types of shaders we care about here: vertex shaders and fragment shaders.
          * The way things are set up, we are already creating both types, but we are wrapping them up in a .fx file.
-         * ".fx" files are a HLSL thing, so we will need to figure out how to put together and compile GLSL files.
+         * ".fx" files are a Hlsl thing, so we will need to figure out how to put together and compile GLSL files.
          */
 
         // NOTE: this may have problems, noteably: all TexParameter's are "i", I picked stuff at random for glTexImage2D, {2}_Texture has to be the right type, and I'm not sure on the "layout" syntax
@@ -765,6 +765,7 @@ struct PixelToFrame
 {0}vec4 Color      : COLOR0;
 }};";
 
+        // TODO: rewrite this. Need to figure out the syntax for compiling OpenGL shaders.
 const string FileEnd =
 @"// Shader compilation
 technique Simplest
