@@ -368,7 +368,7 @@ namespace FragSharp
             if (symbol == null) return false;
 
             var info = TranslationLookup.RecursiveLookup(symbol);
-            if (info.Translation == "sampler") return true;
+            if (info.Translation == "sampler" || info.Translation == "sampler2D") return true;
 
             return false;
         }

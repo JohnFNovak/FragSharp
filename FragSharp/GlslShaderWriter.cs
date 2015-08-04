@@ -537,7 +537,7 @@ namespace FragSharp
                 var translation_info = TranslationLookup.RecursiveLookup(symbol);
                 if (translation_info.Translation != null)
                 {
-                    if (translation_info.Translation == "sampler")
+                    if (translation_info.Translation == "sampler" || translation_info.Translation == "sampler2D")
                     {
                         Write("ERROR(Samplers not suported in vertex shaders : {0})", parameter);
                     }
@@ -575,7 +575,7 @@ namespace FragSharp
                 var translation_info = TranslationLookup.RecursiveLookup(symbol);
                 if (translation_info.Translation != null)
                 {
-                    if (translation_info.Translation == "sampler")
+                    if (translation_info.Translation == "sampler" || translation_info.Translation == "sampler2D")
                     {
                         CompileSamplerParameter(parameter, symbol);
                     }
