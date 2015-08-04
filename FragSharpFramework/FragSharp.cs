@@ -518,11 +518,11 @@ namespace FragSharpFramework
             return (float)Math.Atan2(y, x);
         }
 
-        [Hlsl("atan2"), Glsl("atan")]
+        [Hlsl("atan2"), Glsl("atan", TranslationType.ReverseArguments)]
         protected static vec2 atan2(vec2 y, vec2 x) { return vec(atan(y.x, x.x), atan(y.y, x.y)); }
-        [Hlsl("atan2"), Glsl("atan")]
+        [Hlsl("atan2"), Glsl("atan", TranslationType.ReverseArguments)]
         protected static vec3 atan2(vec3 y, vec3 x) { return vec(atan(y.x, x.x), atan(y.y, x.y), atan(y.z, x.z)); }
-        [Hlsl("atan2"), Glsl("atan")]
+        [Hlsl("atan2"), Glsl("atan", TranslationType.ReverseArguments)]
         protected static vec4 atan2(vec4 y, vec4 x) { return vec(atan(y.x, x.x), atan(y.y, x.y), atan(y.z, x.z), atan(y.w, x.w)); }
 
 

@@ -84,10 +84,10 @@ namespace FragSharpFramework
         }
     }
 
-    [Hlsl("float2"), Glsl("vec2")]
+    [Hlsl("float2"), Glsl]
     public partial struct vec2
     {
-        [Hlsl("float2"), Glsl("vec2")]
+        [Hlsl("float2"), Glsl]
         public vec2(float x, float y)
         {
             this.x = x;
@@ -225,10 +225,10 @@ namespace FragSharpFramework
         public static readonly vec2 Ones = new vec2(1, 1);
     }
 
-    [Hlsl("float3"), Glsl("vec3")]
+    [Hlsl("float3"), Glsl]
     public partial struct vec3
     {
-        [Hlsl("float3"), Glsl("vec3")]
+        [Hlsl("float3"), Glsl]
         public vec3(float x, float y, float z)
         {
             this.x = x;
@@ -337,7 +337,7 @@ namespace FragSharpFramework
         public static readonly vec3 Zero = new vec3(0, 0, 0);
     }
 
-    [Hlsl("float4"), Glsl("vec4")]
+    [Hlsl("float4"), Glsl]
     public partial struct vec4 : Convertible</*KeepInCopy*/ vec4, vec4>
     {
         public vec4 ConvertFrom(/*KeepInCopy*/ vec4 v)
@@ -350,7 +350,7 @@ namespace FragSharpFramework
             return (/*KeepInCopy*/ vec4)this;
         }
 
-        [Hlsl("float4"), Glsl("vec4")]
+        [Hlsl("float4"), Glsl]
         public vec4(float x, float y, float z, float w)
         {
             this.x = x;
