@@ -1012,9 +1012,19 @@ using FragSharpFramework;
             File.WriteAllText(Path.Combine(BuildPaths.BoilerRoot, BoilerplateFileName), BoilerWriter.ToString());
 
             // Compile target shaders
-            BuildGeneratedShaders();
+
+            if (Options.ShaderLanguage == "Hlsl")
+            {
+                BuildGeneratedHlslShaders();
+            }
+            else if (Options.ShaderLanguage == "Glsl")
+            {
+                BuildGeneratedGlslShaders();
+            }
             //BuildGeneratedShaders2();
-            Console.ReadLine();
+
+            //Console.WriteLine("all good, boss");
+            //Console.ReadLine();
         }
 
         static void BuildGeneratedShaders2()
@@ -1093,9 +1103,9 @@ using FragSharpFramework;
         /// <summary>
         /// This is where the shader language files are actually written
         /// </summary>
-        static void BuildGeneratedShaders()
+        static void BuildGeneratedHlslShaders()
         {
-            ContentBuilder contentBuilder = new ContentBuilder();
+            HlslContentBuilder contentBuilder = new HlslContentBuilder();
 
             contentBuilder.Clear();
 
@@ -1143,6 +1153,47 @@ using FragSharpFramework;
                 Console.WriteLine(output);
             }
             */
+
+            var files = Directory.GetFiles(contentBuilder.BuiltDirectory);
+
+            foreach (var file in files)
+            {
+                string new_file = Path.Combine(BuildPaths.ShaderBuildDir, Path.GetFileName(file));
+                File.Copy(file, new_file);
+            }
+        }
+
+        /// <summary>
+        /// This is where the shader language files are actually written
+        /// </summary>
+        static void BuildGeneratedGlslShaders()
+        {
+            GlslContentBuilder contentBuilder = new GlslContentBuilder();
+
+            contentBuilder.Clear();
+
+            foreach (var file in Directory.GetFiles(BuildPaths.ShaderCompileDir, "*.fx"))
+            {
+                string name = Path.GetFileNameWithoutExtension(file);
+
+                contentBuilder.Add(file, name, "EffectImporter", "EffectProcessor");
+            }
+
+            // Empty the build directory
+            Directory.CreateDirectory(BuildPaths.ShaderBuildDir);
+            foreach (var file in Directory.GetFiles(BuildPaths.ShaderBuildDir))
+            {
+                File.Delete(file);
+            }
+
+            // Build the shaders
+            string buildError = contentBuilder.Build();
+
+            if (buildError != null)
+            {
+                Console.WriteLine("BuildError:" + buildError);
+                return;
+            }
 
             var files = Directory.GetFiles(contentBuilder.BuiltDirectory);
 

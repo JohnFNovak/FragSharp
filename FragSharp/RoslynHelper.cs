@@ -22,7 +22,7 @@ namespace FragSharp
             else if (symbol is PropertySymbol)  return ((PropertySymbol) symbol).Type;
             else if (symbol is MethodSymbol)    return ((MethodSymbol)   symbol).ReturnType;
             
-            else throw new Exception("Symbol has no type!");
+            else throw new Exception("Symbol has no type!: " + symbol.ToDisplayString());
         }
 
         protected SemanticModel GetModel(SyntaxNode expression, Dictionary<SyntaxTree, SemanticModel> models)

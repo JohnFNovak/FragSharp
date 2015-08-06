@@ -97,7 +97,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ContentBuilder.cs" />
+    <Compile Include="GlslContentBuilder.cs" />
+    <Compile Include="HlslContentBuilder.cs" />
+    <Compile Include="GlslShaderWriter.cs" />
+    <Compile Include="GlslWriter.cs" />
     <Compile Include="RoslynHelper.cs" />
     <Compile Include="SymbolExtension.cs" />
     <Compile Include="CStyleWriter.cs" />
