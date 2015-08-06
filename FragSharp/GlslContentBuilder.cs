@@ -28,20 +28,18 @@ namespace FragSharp.Build
     /// in a temporary directory. After the build finishes, you can use a regular
     /// ContentManager to load these temporary .xnb files in the usual way.
     /// </summary>
-    class ContentBuilder : IDisposable
+    class GlslContentBuilder : IDisposable
     {
         #region Fields
 
 
         // What importers or processors should we load?
-        const string xnaVersion = ", Version=4.0.0.0, PublicKeyToken=842cf8be1de50553";
+        // const string xnaVersion = ", Version=4.0.0.0, PublicKeyToken=842cf8be1de50553";
 
         static string[] pipelineAssemblies =
         {
-            "Microsoft.Xna.Framework.Content.Pipeline.FBXImporter" + xnaVersion,
-            "Microsoft.Xna.Framework.Content.Pipeline.XImporter" + xnaVersion,
-            "Microsoft.Xna.Framework.Content.Pipeline.TextureImporter" + xnaVersion,
-            "Microsoft.Xna.Framework.Content.Pipeline.EffectImporter" + xnaVersion,
+            "C:\\Users\\John Novak\\Documents\\GitHub\\MonoGame\\MonoGame.Framework.Content.Pipeline\\MonoGame.Framework.Content.Pipeline.dll",
+            "C:\\Users\\John Novak\\Documents\\GitHub\\MonoGame\\MonoGame.Framework\\MonoGame.Framework.Windows.dll",
 
             // If you want to use custom importers or processors from
             // a Content Pipeline Extension Library, add them here.
@@ -100,7 +98,7 @@ namespace FragSharp.Build
         /// </summary>
         public string BuiltDirectory
         {
-            get { return Path.Combine(buildDirectory, "bin/Content"); }
+            get { return Path.Combine(buildDirectory, "Content/bin"); }
         }
 
         #endregion
@@ -111,7 +109,7 @@ namespace FragSharp.Build
         /// <summary>
         /// Creates a new content builder.
         /// </summary>
-        public ContentBuilder()
+        public GlslContentBuilder()
         {
             CreateTempDirectory();
             CreateBuildProject();
@@ -121,7 +119,7 @@ namespace FragSharp.Build
         /// <summary>
         /// Finalizes the content builder.
         /// </summary>
-        ~ContentBuilder()
+        ~GlslContentBuilder()
         {
             Dispose(false);
         }
@@ -169,11 +167,11 @@ namespace FragSharp.Build
             projectRootElement = ProjectRootElement.Create(projectPath);
 
             // Include the standard targets file that defines how to build XNA Framework content.
-            projectRootElement.AddImport("$(MSBuildExtensionsPath)\\Microsoft\\XNA Game Studio\\" +
-                                         "v4.0\\Microsoft.Xna.GameStudio.ContentPipeline.targets");
+            projectRootElement.AddImport("$(MSBuildExtensionsPath)\\MonoGame\\v3.0\\MonoGame.Content.Builder.targets");
 
             buildProject = new Project(projectRootElement);
 
+            buildProject.SetProperty("MonoGamePlatform", "Windows");
             buildProject.SetProperty("XnaPlatform", "Windows");
             buildProject.SetProperty("XnaProfile", "HiDef");
             buildProject.SetProperty("XnaFrameworkVersion", "v4.0");
