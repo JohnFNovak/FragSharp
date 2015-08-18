@@ -971,7 +971,6 @@ using FragSharpFramework;
 
             // Compile shaders from C# to target language
             StringWriter BoilerWriter = new StringWriter();
-            // TODO: deal with this
             if (Options.ShaderLanguage == "Hlsl")
             {
                 BoilerWriter.WriteLine(HlslShaderWriter.BoilerFileBegin, Tab);
