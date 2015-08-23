@@ -25,7 +25,7 @@ namespace FragSharp
     /// </summary>
     public class Options
     {
-        public static string ShaderLanguage = "Hlsl";
+        public static string ShaderLanguage = "Glsl";
     }
 
     public static class Assert
@@ -113,7 +113,8 @@ namespace FragSharp
             foreach (var member in members)
             {
                 // GetAttribute should get the attribute corresponding to whichever shader language we are using.
-                var attribute = member.GetAttribute(Options.ShaderLanguage);
+                //var attribute = member.GetAttribute(Options.ShaderLanguage);
+                var attribute = member.GetAttribute("Hlsl");
                 if (attribute != null)
                 {
                     // Get single argument to this function. It will serve as the key in the map.
@@ -148,7 +149,8 @@ namespace FragSharp
                     continue;
                 }
 
-                var attribute = symbol.GetAttribute(Options.ShaderLanguage);
+                //var attribute = symbol.GetAttribute(Options.ShaderLanguage);
+                var attribute = symbol.GetAttribute("Hlsl");
 
                 if (attribute != null)
                 {
@@ -203,7 +205,8 @@ namespace FragSharp
                 {
                     if (member is NamedTypeSymbol) continue; // Skip nested type defintions. We alraedy processed all types.
 
-                    var attribute = member.GetAttribute(Options.ShaderLanguage);
+                    //var attribute = member.GetAttribute(Options.ShaderLanguage);
+                    var attribute = member.GetAttribute("Hlsl");
                     if (attribute != null)
                     {
                         CreateMapEntry(member, attribute);
@@ -253,20 +256,10 @@ namespace FragSharp
                                 try
                                 {
                                     //if (constructor != null)// && SymbolMap.ContainsKey(constructor))
-                                    if (Options.ShaderLanguage == "Hlsl")
-                                    {
-                                        var writer = new HlslWriter(Models, Compilation);
+                                    var writer = new HlslWriter(Models, Compilation);
 
-                                        writer.CompileExpression(creation);
-                                        translation = writer.GetString();
-                                    }
-                                    else if (Options.ShaderLanguage == "Glsl")
-                                    {
-                                        var writer = new GlslWriter(Models, Compilation);
-
-                                        writer.CompileExpression(creation);
-                                        translation = writer.GetString();
-                                    }
+                                    writer.CompileExpression(creation);
+                                    translation = writer.GetString();
                                 }
                                 catch (Exception e)
                                 {
@@ -441,7 +434,7 @@ namespace FragSharp
             {
                 string filename = SpecializationFileName(specialization);
                 string suffix = SpecializationVarSuffix(specialization);
-                BoilerWriter.WriteLine("{0}{0}{0}{1}.{2}.CompiledEffect{3} = Content.Load<Effect>(\"FragSharpShaders/{4}\");", Tab, Symbol.ContainingNamespace, Symbol.Name, suffix, filename);
+                BoilerWriter.WriteLine("{0}{0}{0}{1}.{2}.CompiledEffect{3} = Content.Load<Effect>(\"__GeneratedShaders/{4}\");", Tab, Symbol.ContainingNamespace, Symbol.Name, suffix, filename);
             }
         }
 
@@ -480,34 +473,17 @@ namespace FragSharp
         {
             if (!IsValidShader()) return null;
 
-            if (Options.ShaderLanguage == "Hlsl") {
-                HlslShaderWriter writer = new HlslShaderWriter(Models, SourceCompilation, specialization);
+            HlslShaderWriter writer = new HlslShaderWriter(Models, SourceCompilation, specialization);
 
-                string fragment = writer.CompileShader(Symbol, VertexShaderDecleration, FragmentShaderDecleration);
+            string fragment = writer.CompileShader(Symbol, VertexShaderDecleration, FragmentShaderDecleration);
 
-                string boilerplate = null;
-                if (CompileBoilerplate)
-                {
-                    boilerplate = writer.CompileShaderBoilerplate(Symbol, Specializations);
-                }
-
-                return new ShaderCompilation(fragment, boilerplate);
-            }
-            //else if (Options.ShaderLanguage == "Glsl")  // This is comented out because we have to be sure that Compile returns <emph> something </emph>
-            else
+            string boilerplate = null;
+            if (CompileBoilerplate)
             {
-                GlslShaderWriter writer = new GlslShaderWriter(Models, SourceCompilation, specialization);
-
-                string fragment = writer.CompileShader(Symbol, VertexShaderDecleration, FragmentShaderDecleration);
-
-                string boilerplate = null;
-                if (CompileBoilerplate)
-                {
-                    boilerplate = writer.CompileShaderBoilerplate(Symbol, Specializations);
-                }
-
-                return new ShaderCompilation(fragment, boilerplate);
+                boilerplate = writer.CompileShaderBoilerplate(Symbol, Specializations);
             }
+
+            return new ShaderCompilation(fragment, boilerplate);
         }
 
         /// <summary>
@@ -971,36 +947,18 @@ using FragSharpFramework;
 
             // Compile shaders from C# to target language
             StringWriter BoilerWriter = new StringWriter();
-            if (Options.ShaderLanguage == "Hlsl")
+            BoilerWriter.WriteLine(HlslShaderWriter.BoilerFileBegin, Tab);
+            BoilerWriter.WriteLine();
+
+            BoilerWriter.WriteLine(HlslShaderWriter.BoilerBeginInitializer, Tab);
+
+            foreach (var shader in ShaderClass.Shaders)
             {
-                BoilerWriter.WriteLine(HlslShaderWriter.BoilerFileBegin, Tab);
-                BoilerWriter.WriteLine();
-
-                BoilerWriter.WriteLine(HlslShaderWriter.BoilerBeginInitializer, Tab);
-
-                foreach (var shader in ShaderClass.Shaders)
-                {
-                    shader.WriteLoadCode(BoilerWriter, Tab);
-                }
-
-                BoilerWriter.WriteLine(HlslShaderWriter.BoilerEndInitializer, Tab);
-                BoilerWriter.WriteLine();
-            } 
-            else if (Options.ShaderLanguage == "Glsl")
-            {
-                BoilerWriter.WriteLine(GlslShaderWriter.BoilerFileBegin, Tab);
-                BoilerWriter.WriteLine();
-
-                BoilerWriter.WriteLine(GlslShaderWriter.BoilerBeginInitializer, Tab);
-
-                foreach (var shader in ShaderClass.Shaders)
-                {
-                    shader.WriteLoadCode(BoilerWriter, Tab);
-                }
-
-                BoilerWriter.WriteLine(GlslShaderWriter.BoilerEndInitializer, Tab);
-                BoilerWriter.WriteLine();
+                shader.WriteLoadCode(BoilerWriter, Tab);
             }
+
+            BoilerWriter.WriteLine(HlslShaderWriter.BoilerEndInitializer, Tab);
+            BoilerWriter.WriteLine();
 
             foreach (var shader in ShaderClass.Shaders)
             {
@@ -1018,6 +976,7 @@ using FragSharpFramework;
             }
             else if (Options.ShaderLanguage == "Glsl")
             {
+                // I think we want to call 2MGFX here
                 BuildGeneratedGlslShaders();
             }
             //BuildGeneratedShaders2();
@@ -1050,22 +1009,6 @@ using FragSharpFramework;
                 string output_file = Path.Combine(BuildPaths.ShaderBuildDir, Path.GetFileNameWithoutExtension(file)) + ".xnb";
                 File.WriteAllBytes(output_file, ShaderObject);
             }
-
-            //foreach (var shader in ShaderClass.Shaders)
-            //{
-            //    if (shader.TargetFile == null) continue;
-
-            //    string fx = File.ReadAllText(shader.TargetFile);
-
-            //    EffectProcessor effectProcessor = new EffectProcessor();
-            //    effectProcessor.DebugMode = EffectProcessorDebugMode.Debug;
-            //    var effect = effectProcessor.Process(new EffectContent { EffectCode = fx }, new MyProcessorContext());
-
-            //    byte[] ShaderObject = effect.GetEffectCode();
-
-            //    string output_file = Path.Combine(BuildPaths.ShaderBuildDir, Path.GetFileNameWithoutExtension(shader.TargetFile)) + ".xnb";
-            //    File.WriteAllBytes(output_file, ShaderObject);
-            //}
         }
 
         class MyProcessorLogger : ContentBuildLogger
@@ -1167,17 +1110,6 @@ using FragSharpFramework;
         /// </summary>
         static void BuildGeneratedGlslShaders()
         {
-            GlslContentBuilder contentBuilder = new GlslContentBuilder();
-
-            contentBuilder.Clear();
-
-            foreach (var file in Directory.GetFiles(BuildPaths.ShaderCompileDir, "*.fx"))
-            {
-                string name = Path.GetFileNameWithoutExtension(file);
-
-                contentBuilder.Add(file, name, "EffectImporter", "EffectProcessor");
-            }
-
             // Empty the build directory
             Directory.CreateDirectory(BuildPaths.ShaderBuildDir);
             foreach (var file in Directory.GetFiles(BuildPaths.ShaderBuildDir))
@@ -1185,18 +1117,27 @@ using FragSharpFramework;
                 File.Delete(file);
             }
 
-            // Build the shaders
-            string buildError = contentBuilder.Build();
-
-            if (buildError != null)
+            foreach (var file in Directory.GetFiles(BuildPaths.ShaderCompileDir, "*.fx"))
             {
-                Console.WriteLine("BuildError:" + buildError);
-                return;
+                string name = Path.GetFullPath(file);
+                Console.WriteLine("\"" + name + "\" \"" + Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) + ".xnb\"");
+
+                Process p = new Process();
+                p.StartInfo.FileName = "\"C:\\Program Files (x86)\\MSBuild\\MonoGame\\v3.0\\Tools\\2MGFX.exe\"";
+                p.StartInfo.Arguments = "\"" + name + "\" \"" + Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) + ".xnb\"";
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.Start();
+
+                string output = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+
+                Console.WriteLine("Output:");
+                Console.WriteLine(output);
+                Console.ReadLine();
             }
 
-            var files = Directory.GetFiles(contentBuilder.BuiltDirectory);
-
-            foreach (var file in files)
+            foreach (var file in Directory.GetFiles(BuildPaths.ShaderCompileDir, "*.xnb"))
             {
                 string new_file = Path.Combine(BuildPaths.ShaderBuildDir, Path.GetFileName(file));
                 File.Copy(file, new_file);
