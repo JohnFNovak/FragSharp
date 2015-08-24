@@ -25,7 +25,7 @@ namespace FragSharp
     /// </summary>
     public class Options
     {
-        public static string ShaderLanguage = "Hlsl";
+        public static string ShaderLanguage = "Glsl";
     }
 
     public static class Assert
@@ -1167,17 +1167,6 @@ using FragSharpFramework;
         /// </summary>
         static void BuildGeneratedGlslShaders()
         {
-            GlslContentBuilder contentBuilder = new GlslContentBuilder();
-
-            contentBuilder.Clear();
-
-            foreach (var file in Directory.GetFiles(BuildPaths.ShaderCompileDir, "*.fx"))
-            {
-                string name = Path.GetFileNameWithoutExtension(file);
-
-                contentBuilder.Add(file, name, "EffectImporter", "EffectProcessor");
-            }
-
             // Empty the build directory
             Directory.CreateDirectory(BuildPaths.ShaderBuildDir);
             foreach (var file in Directory.GetFiles(BuildPaths.ShaderBuildDir))
@@ -1185,18 +1174,7 @@ using FragSharpFramework;
                 File.Delete(file);
             }
 
-            // Build the shaders
-            string buildError = contentBuilder.Build();
-
-            if (buildError != null)
-            {
-                Console.WriteLine("BuildError:" + buildError);
-                return;
-            }
-
-            var files = Directory.GetFiles(contentBuilder.BuiltDirectory);
-
-            foreach (var file in files)
+            foreach (var file in Directory.GetFiles(BuildPaths.ShaderCompileDir, "*.fx"))
             {
                 string new_file = Path.Combine(BuildPaths.ShaderBuildDir, Path.GetFileName(file));
                 File.Copy(file, new_file);

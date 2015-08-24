@@ -191,6 +191,7 @@ namespace FragSharpFramework
     /// </summary>
     public abstract class Shader : FragSharpStd { }
 
+    // TODO: for GLSL, there is no output, so not sure what to do with VertexToPixel
     [Hlsl("VertexToPixel"), Glsl("VertexToPixel")]
     public struct VertexOut
     {
