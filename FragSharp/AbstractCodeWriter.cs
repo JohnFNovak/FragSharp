@@ -286,13 +286,20 @@ namespace FragSharp
 
         virtual protected void CompileStatement(StatementSyntax statement)
         {
-            if      (statement is IfStatementSyntax)               CompileIfStatement(              (IfStatementSyntax)              statement);
-            else if (statement is LocalDeclarationStatementSyntax) CompileLocalDeclarationStatement((LocalDeclarationStatementSyntax)statement);
-            else if (statement is BlockSyntax)                     CompileBlock(                    (BlockSyntax)                    statement);
-            else if (statement is ExpressionStatementSyntax)       CompileExpressionStatement(      (ExpressionStatementSyntax)      statement);
-            else if (statement is ReturnStatementSyntax)           CompileReturnStatement(          (ReturnStatementSyntax)          statement);
-            else if (statement is ThrowStatementSyntax)            CompileThrowStatement(           (ThrowStatementSyntax)           statement);
-            else if (statement is StatementSyntax)                 WriteLine("statement {0}", statement.GetType());
+            try
+            {
+                if (statement is IfStatementSyntax) CompileIfStatement((IfStatementSyntax)statement);
+                else if (statement is LocalDeclarationStatementSyntax) CompileLocalDeclarationStatement((LocalDeclarationStatementSyntax)statement);
+                else if (statement is BlockSyntax) CompileBlock((BlockSyntax)statement);
+                else if (statement is ExpressionStatementSyntax) CompileExpressionStatement((ExpressionStatementSyntax)statement);
+                else if (statement is ReturnStatementSyntax) CompileReturnStatement((ReturnStatementSyntax)statement);
+                else if (statement is ThrowStatementSyntax) CompileThrowStatement((ThrowStatementSyntax)statement);
+                else if (statement is StatementSyntax) WriteLine("statement {0}", statement.GetType());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
         abstract protected void CompileIfStatement(IfStatementSyntax statement);
@@ -304,19 +311,26 @@ namespace FragSharp
 
         virtual public void CompileExpression(ExpressionSyntax expression)
         {
-            if      (expression is BinaryExpressionSyntax)         CompileBinaryExpression(        (BinaryExpressionSyntax)        expression);
-            else if (expression is MemberAccessExpressionSyntax)   CompileMemberAccessExpression(  (MemberAccessExpressionSyntax)  expression);
-            else if (expression is IdentifierNameSyntax)           CompileIdentifierName(          (IdentifierNameSyntax)          expression);
-            else if (expression is ElementAccessExpressionSyntax)  CompileElementAccessExpression( (ElementAccessExpressionSyntax) expression);
-            else if (expression is InvocationExpressionSyntax)     CompileInvocationExpression(    (InvocationExpressionSyntax)    expression);
-            else if (expression is CastExpressionSyntax)           CompileCastExpression(          (CastExpressionSyntax)          expression);
-            else if (expression is ParenthesizedExpressionSyntax)  CompileParenthesizedExpression( (ParenthesizedExpressionSyntax) expression);
-            else if (expression is TypeSyntax)                     CompileType(                    (TypeSyntax)                    expression);
-            else if (expression is LiteralExpressionSyntax)        CompileLiteralExpression(       (LiteralExpressionSyntax)       expression);
-            else if (expression is ConditionalExpressionSyntax)    CompileConditionalExpression(   (ConditionalExpressionSyntax)   expression);
-            else if (expression is ObjectCreationExpressionSyntax) CompileObjectCreationExpression((ObjectCreationExpressionSyntax)expression);
-            else if (expression is PrefixUnaryExpressionSyntax)    CompilePrefixUnaryExpression(   (PrefixUnaryExpressionSyntax)   expression);
-            else Write("expression " + expression.GetType().Name);
+            try
+            {
+                if (expression is BinaryExpressionSyntax) CompileBinaryExpression((BinaryExpressionSyntax)expression);
+                else if (expression is MemberAccessExpressionSyntax) CompileMemberAccessExpression((MemberAccessExpressionSyntax)expression);
+                else if (expression is IdentifierNameSyntax) CompileIdentifierName((IdentifierNameSyntax)expression);
+                else if (expression is ElementAccessExpressionSyntax) CompileElementAccessExpression((ElementAccessExpressionSyntax)expression);
+                else if (expression is InvocationExpressionSyntax) CompileInvocationExpression((InvocationExpressionSyntax)expression);
+                else if (expression is CastExpressionSyntax) CompileCastExpression((CastExpressionSyntax)expression);
+                else if (expression is ParenthesizedExpressionSyntax) CompileParenthesizedExpression((ParenthesizedExpressionSyntax)expression);
+                else if (expression is TypeSyntax) CompileType((TypeSyntax)expression);
+                else if (expression is LiteralExpressionSyntax) CompileLiteralExpression((LiteralExpressionSyntax)expression);
+                else if (expression is ConditionalExpressionSyntax) CompileConditionalExpression((ConditionalExpressionSyntax)expression);
+                else if (expression is ObjectCreationExpressionSyntax) CompileObjectCreationExpression((ObjectCreationExpressionSyntax)expression);
+                else if (expression is PrefixUnaryExpressionSyntax) CompilePrefixUnaryExpression((PrefixUnaryExpressionSyntax)expression);
+                else Write("expression " + expression.GetType().Name);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
         abstract protected void CompileBinaryExpression(BinaryExpressionSyntax expression);
