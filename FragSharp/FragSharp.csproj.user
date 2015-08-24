@@ -3,4 +3,16 @@
   <PropertyGroup>
     <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <StartAction>Project</StartAction>
+    <StartArguments>"C:\Users\John Novak\Documents\GitHub\WeAreMono\WeAreMono\WeAreMono.csproj " "C:\Users\John Novak\Documents\GitHub\WeAreMono\WeAreMono\bin\WindowsGL\Debug\ " "Debug"</StartArguments>
+    <StartProgram>
+    </StartProgram>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <StartAction>Project</StartAction>
+    <StartProgram>
+    </StartProgram>
+    <StartArguments>"C:\Users\John Novak\Documents\GitHub\WeAreMono\WeAreMono\WeAreMono.csproj " "C:\Users\John Novak\Documents\GitHub\WeAreMono\WeAreMono\bin\WindowsGL\Debug\ " "Debug"</StartArguments>
+  </PropertyGroup>
 </Project>

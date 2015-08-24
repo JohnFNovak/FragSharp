@@ -1174,6 +1174,26 @@ using FragSharpFramework;
                 File.Delete(file);
             }
 
+            //foreach (var file in Directory.GetFiles(BuildPaths.ShaderCompileDir, "*.fx"))
+            //{
+            //    string name = Path.GetFullPath(file);
+            //    Console.WriteLine("\"" + name + "\" \"" + Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) + ".xnb\"");
+
+            //    Process p = new Process();
+            //    p.StartInfo.FileName = "\"C:\\Program Files (x86)\\MSBuild\\MonoGame\\v3.0\\Tools\\2MGFX.exe\"";
+            //    p.StartInfo.Arguments = "\"" + name + "\" \"" + Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) + ".xnb\"";
+            //    p.StartInfo.UseShellExecute = false;
+            //    p.StartInfo.RedirectStandardOutput = true;
+            //    p.Start();
+
+            //    string output = p.StandardOutput.ReadToEnd();
+            //    p.WaitForExit();
+
+            //    Console.WriteLine("Output:");
+            //    Console.WriteLine(output);
+            //    Console.ReadLine();
+            //}
+
             foreach (var file in Directory.GetFiles(BuildPaths.ShaderCompileDir, "*.fx"))
             {
                 string new_file = Path.Combine(BuildPaths.ShaderBuildDir, Path.GetFileName(file));
