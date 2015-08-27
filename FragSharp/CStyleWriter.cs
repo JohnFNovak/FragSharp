@@ -50,6 +50,16 @@ namespace FragSharp
         {
         }
 
+        public CStyleWriter(MonoGLWriter writer)
+            : base(writer)
+        {
+        }
+
+        public CStyleWriter(MonoXWriter writer)
+            : base(writer)
+        {
+        }
+
         override protected CompiledMethod CompileMethod(Symbol symbol)
         {
             ClearString();

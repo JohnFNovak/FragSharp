@@ -100,7 +100,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MonoXContentBuilder.cs" />
+    <Compile Include="MonoGLContentBuilder.cs" />
     <Compile Include="GlslContentBuilder.cs" />
+    <Compile Include="MonoXShaderWriter.cs" />
+    <Compile Include="MonoGLShaderWriter.cs" />
+    <Compile Include="MonoXWriter.cs" />
+    <Compile Include="MonoGLWriter.cs" />
     <Compile Include="HlslContentBuilder.cs" />
     <Compile Include="GlslShaderWriter.cs" />
     <Compile Include="GlslWriter.cs" />

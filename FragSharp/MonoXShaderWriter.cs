@@ -14,9 +14,9 @@ namespace FragSharp
     /// <summary>
     /// This class is responsible for generating the C# boilerplate which will be used to compile the generated FragSharp shaders.
     /// </summary>
-    internal class GlslShaderWriter : GlslWriter
+    internal class MonoXShaderWriter : MonoXWriter
     {
-        public GlslShaderWriter(Dictionary<SyntaxTree, SemanticModel> models, Compilation compilation, Dictionary<Symbol, string> specialization)
+        public MonoXShaderWriter(Dictionary<SyntaxTree, SemanticModel> models, Compilation compilation, Dictionary<Symbol, string> specialization)
             : base(models, compilation)
         {
             this.specialization = specialization;
